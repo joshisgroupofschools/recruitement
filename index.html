@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Teacher Recruitment Portal</title>
+  <style>
+    :root{
+      --bg:#f4f8f6;
+      --card:#ffffff;
+      --primary:#1f5f4a;
+      --primary-dark:#184839;
+      --muted:#60766d;
+      --border:#d7e2dc;
+      --text:#18342a;
+      --success:#1f7a4c;
+      --danger:#a93d3d;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Segoe UI,Tahoma,sans-serif;background:linear-gradient(180deg,#f7fbf9 0%,var(--bg) 100%);color:var(--text)}
+    .wrap{max-width:860px;margin:0 auto;padding:14px}
+    .hero,.card{background:var(--card);border:1px solid var(--border);border-radius:22px;box-shadow:0 12px 34px rgba(24,52,42,.08)}
+    .hero{overflow:hidden}
+    .hero-inner{padding:24px 18px;background:linear-gradient(135deg,rgba(31,95,74,.96),rgba(24,72,57,.92));color:#fff}
+    .tag{display:inline-block;padding:7px 11px;border-radius:999px;background:rgba(255,255,255,.14);font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+    h1,h2,p{margin:0}
+    h1{margin-top:12px;font-size:29px;line-height:1.08}
+    .hero p{margin-top:10px;font-weight:600;color:rgba(255,255,255,.88)}
+    .schools{margin-top:14px;font-size:14px;line-height:1.6;color:rgba(255,255,255,.9)}
+    .card{margin-top:14px;padding:16px}
+    .card h2{font-size:22px}
+    .card p{margin-top:8px;color:var(--muted)}
+    form{display:grid;gap:14px;margin-top:18px}
+    .field{display:flex;flex-direction:column;gap:8px}
+    label{font-weight:600}
+    .req{color:var(--danger)}
+    input,select,textarea,button{font:inherit}
+    input,select,textarea{width:100%;padding:13px 14px;border:1px solid var(--border);border-radius:14px;background:#fbfdfc;color:var(--text)}
+    textarea{min-height:110px;resize:vertical}
+    .choice-group{display:grid;gap:10px}
+    .choice{display:flex;gap:10px;align-items:center;padding:12px 14px;border:1px solid var(--border);border-radius:14px;background:#fbfdfc}
+    .hint{font-size:13px;color:var(--muted)}
+    .btn{border:none;border-radius:14px;padding:14px 16px;cursor:pointer}
+    .btn-primary{background:var(--primary);color:#fff;font-weight:700}
+    .btn-primary:hover{background:var(--primary-dark)}
+    .toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:#fff;border:1px solid var(--border);border-radius:14px;padding:13px 16px;box-shadow:0 10px 24px rgba(24,52,42,.12);display:none;z-index:5}
+    .toast.show{display:block}
+    .toast.success{color:var(--success)}
+    .toast.error{color:var(--danger)}
+    .hidden{display:none!important}
+    @media (min-width:768px){
+      .wrap{padding:20px}
+      .hero-inner{padding:32px}
+      h1{font-size:40px}
+      form.two-col{grid-template-columns:repeat(2,minmax(0,1fr))}
+      form.two-col .full{grid-column:1/-1}
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <section class="hero">
+      <div class="hero-inner">
+        <span class="tag">Teacher Recruitment Portal</span>
+        <h1>JOSHI'S GROUP OF SCHOOLS</h1>
+        <p>UPPAL | BODUPPAL | PEERZADIGUDA</p>
+        <div class="schools">Joshi's SSC | Joshi's CBSE | Eurokids, SBH Colony | Joshi's Kindergarten | Kakatiya Techno School | Sri Gayatri School</div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Teacher Application Form</h2>
+      <p>Fill in your details and upload your resume.</p>
+      <form id="applicationForm" class="two-col"></form>
+    </section>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+  <script>
+    const API_URL = 'https://script.google.com/macros/s/AKfycbyY9QQ3C8g-OFnUe0AmeH9ursYlKaFDkwMnnYBTy1Thcw2_Y9g8jgmVzEGRKJfS4VqsqA/exec';
+    let formQuestions = [];
+
+    document.addEventListener('DOMContentLoaded', init);
+
+    async function init() {
+      try {
+        const result = await apiGet('bootstrap');
+        formQuestions = result.publicForm.questions || [];
+        renderForm();
+      } catch (error) {
+        showToast(error.message || 'Could not load form.', true);
+      }
+    }
+
+    function renderForm() {
+      const form = document.getElementById('applicationForm');
+      form.innerHTML = '';
+      formQuestions.forEach(question => {
+        form.appendChild(buildField(question));
+      });
+      const submit = document.createElement('button');
+      submit.type = 'submit';
+      submit.className = 'btn btn-primary full';
+      submit.textContent = 'Submit Application';
+      form.appendChild(submit);
+      form.addEventListener('submit', handleSubmit);
+    }
+
+    function buildField(question) {
+      const field = document.createElement('div');
+      field.className = 'field' + (question.type === 'long_text' || question.type === 'multiple_choice' || question.type === 'multi_select' || question.type === 'file_upload' ? ' full' : '');
+      const label = document.createElement('label');
+      label.textContent = question.text;
+      if (question.required) {
+        const req = document.createElement('span');
+        req.className = 'req';
+        req.textContent = ' *';
+        label.appendChild(req);
+      }
+      field.appendChild(label);
+      field.appendChild(createInput(question));
+      if (question.type === 'file_upload') {
+        const hint = document.createElement('div');
+        hint.className = 'hint';
+        hint.textContent = 'Accepted formats: PDF, DOC, DOCX, JPG, JPEG, PNG';
+        field.appendChild(hint);
+      }
+      return field;
+    }
+
+    function createInput(question) {
+      if (question.type === 'long_text') {
+        const el = document.createElement('textarea');
+        el.name = question.key;
+        return el;
+      }
+      if (question.type === 'dropdown') {
+        const el = document.createElement('select');
+        el.name = question.key;
+        el.appendChild(new Option('Select', ''));
+        (question.options || []).forEach(option => el.appendChild(new Option(option, option)));
+        return el;
+      }
+      if (question.type === 'multiple_choice') {
+        const wrap = document.createElement('div');
+        wrap.className = 'choice-group';
+        (question.options || []).forEach(option => {
+          const label = document.createElement('label');
+          label.className = 'choice';
+          label.innerHTML = `<input type="radio" name="${question.key}" value="${escapeHtml(option)}"> <span>${escapeHtml(option)}</span>`;
+          wrap.appendChild(label);
+        });
+        return wrap;
+      }
+      if (question.type === 'multi_select') {
+        const wrap = document.createElement('div');
+        wrap.className = 'choice-group';
+        (question.options || []).forEach(option => {
+          const label = document.createElement('label');
+          label.className = 'choice';
+          label.innerHTML = `<input type="checkbox" name="${question.key}" value="${escapeHtml(option)}"> <span>${escapeHtml(option)}</span>`;
+          wrap.appendChild(label);
+        });
+        return wrap;
+      }
+      const el = document.createElement('input');
+      el.name = question.key;
+      el.type = mapInputType(question.type);
+      if (question.type === 'file_upload') {
+        el.accept = '.pdf,.doc,.docx,.jpg,.jpeg,.png';
+      }
+      return el;
+    }
+
+    function mapInputType(type) {
+      return {
+        short_text: 'text',
+        number: 'number',
+        mobile_number: 'tel',
+        email: 'email',
+        date: 'date',
+        file_upload: 'file'
+      }[type] || 'text';
+    }
+
+    async function handleSubmit(event) {
+      event.preventDefault();
+      try {
+        const answers = {};
+        for (const question of formQuestions) {
+          answers[question.key] = await readValue(question);
+        }
+        const payload = { answers };
+        const result = await apiPost('submitApplication', { payload });
+        event.target.reset();
+        showToast(result.message, false);
+      } catch (error) {
+        showToast(error.message || 'Could not submit application.', true);
+      }
+    }
+
+    async function readValue(question) {
+      if (question.type === 'multiple_choice') {
+        const selected = document.querySelector(`input[name="${question.key}"]:checked`);
+        return selected ? selected.value : '';
+      }
+      if (question.type === 'multi_select') {
+        return [...document.querySelectorAll(`input[name="${question.key}"]:checked`)].map(item => item.value);
+      }
+      if (question.type === 'file_upload') {
+        const input = document.querySelector(`[name="${question.key}"]`);
+        const file = input && input.files ? input.files[0] : null;
+        if (!file) return null;
+        return await fileToBase64(file);
+      }
+      const input = document.querySelector(`[name="${question.key}"]`);
+      return input ? input.value : '';
+    }
+
+    function fileToBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          resolve({
+            name: file.name,
+            mimeType: file.type,
+            base64: String(reader.result).split(',')[1]
+          });
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+
+    async function apiGet(action, params = {}) {
+      const url = new URL(API_URL);
+      url.searchParams.set('action', action);
+      Object.keys(params).forEach(key => {
+        if (params[key] !== undefined && params[key] !== null && params[key] !== '') {
+          url.searchParams.set(key, params[key]);
+        }
+      });
+      const response = await fetch(url.toString());
+      const result = await response.json();
+      if (result.status !== 'success') throw new Error(result.message || 'Request failed');
+      return result.data;
+    }
+
+    async function apiPost(action, body = {}) {
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(Object.assign({ action }, body))
+      });
+      const result = await response.json();
+      if (result.status !== 'success') throw new Error(result.message || 'Request failed');
+      return result.data;
+    }
+
+    function showToast(message, isError) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.className = 'toast show ' + (isError ? 'error' : 'success');
+      clearTimeout(showToast.timer);
+      showToast.timer = setTimeout(() => toast.className = 'toast', 3200);
+    }
+
+    function escapeHtml(value) {
+      return String(value || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+  </script>
+</body>
+</html>

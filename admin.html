@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Teacher Recruitment Admin</title>
+  <style>
+    :root{
+      --bg:#f4f8f6;
+      --card:#ffffff;
+      --primary:#1f5f4a;
+      --primary-dark:#184839;
+      --muted:#61776f;
+      --border:#d7e2dc;
+      --text:#18342a;
+      --danger:#a93d3d;
+      --success:#1f7a4c;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;padding:14px;background:linear-gradient(180deg,#f7fbf9 0%,var(--bg) 100%);font-family:Segoe UI,Tahoma,sans-serif;color:var(--text)}
+    .wrap{max-width:1200px;margin:0 auto}
+    .card,.panel,.drawer{background:var(--card);border:1px solid var(--border);border-radius:20px;box-shadow:0 12px 34px rgba(24,52,42,.08)}
+    .card,.panel{padding:16px}
+    h1,h2,h3,p{margin:0}
+    .sub{margin-top:8px;color:var(--muted)}
+    .login{max-width:420px;margin:70px auto 0}
+    input,select,textarea,button{font:inherit}
+    input,select,textarea{width:100%;padding:13px 14px;border:1px solid var(--border);border-radius:14px;background:#fbfdfc;color:var(--text)}
+    textarea{min-height:110px;resize:vertical}
+    .field{display:flex;flex-direction:column;gap:8px}
+    .field + .field{margin-top:12px}
+    .btn{border:none;border-radius:14px;padding:13px 16px;cursor:pointer}
+    .btn-primary{background:var(--primary);color:#fff;font-weight:700}
+    .btn-primary:hover{background:var(--primary-dark)}
+    .btn-secondary{background:#eef4f1;color:var(--text);border:1px solid var(--border)}
+    .btn-danger{background:#faecec;color:var(--danger);border:1px solid #efcfcf}
+    .toolbar,.topbar,.filters,.inline{display:flex;gap:10px;flex-wrap:wrap}
+    .topbar{justify-content:space-between;align-items:flex-start;margin-bottom:14px}
+    .hidden{display:none!important}
+    .stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+    .stat{padding:16px;border-radius:18px;border:1px solid var(--border);background:linear-gradient(180deg,#fff,#f5faf7);text-align:left}
+    .stat strong{display:block;margin-top:8px;font-size:28px}
+    .filters{margin:14px 0}
+    .filters .field{flex:1 1 180px}
+    .mobile-list{display:grid;gap:12px}
+    .app-card{padding:16px;border:1px solid var(--border);border-radius:18px;background:#fff}
+    .app-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+    .app-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:14px}
+    .app-grid small,.answer small,.q-item small{display:block;color:var(--muted);margin-bottom:4px}
+    .pill{display:inline-flex;padding:8px 12px;border-radius:999px;background:#d9eadf;color:#184839;font-size:13px;font-weight:700}
+    .desktop-table{display:none}
+    table{width:100%;border-collapse:collapse;min-width:900px}
+    th,td{padding:12px;border-bottom:1px solid var(--border);text-align:left;vertical-align:top}
+    th{background:#f6faf8;color:var(--muted);font-size:12px;text-transform:uppercase}
+    .table-wrap{overflow:auto;border:1px solid var(--border);border-radius:16px}
+    .drawer-backdrop{position:fixed;inset:0;background:rgba(18,42,34,.4);display:none;z-index:10}
+    .drawer-backdrop.show{display:block}
+    .drawer{position:fixed;right:0;top:0;bottom:0;width:min(100%,460px);padding:18px;overflow:auto;transform:translateX(100%);transition:transform .2s ease;z-index:11}
+    .drawer.show{transform:translateX(0)}
+    .answers,.q-list{display:grid;gap:12px}
+    .answer,.q-item{padding:14px;border:1px solid var(--border);border-radius:16px;background:#fbfdfc}
+    .section-tabs{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+    .toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);display:none;background:#fff;border:1px solid var(--border);border-radius:14px;padding:13px 16px;box-shadow:0 10px 24px rgba(24,52,42,.12);z-index:15}
+    .toast.show{display:block}
+    .toast.success{color:var(--success)}
+    .toast.error{color:var(--danger)}
+    .q-grid{display:grid;gap:10px}
+    .empty{padding:24px;border:1px dashed var(--border);border-radius:16px;text-align:center;color:var(--muted)}
+    @media (min-width:768px){
+      body{padding:20px}
+      .stats{grid-template-columns:repeat(3,minmax(0,1fr))}
+      .desktop-table{display:block}
+      .mobile-list{display:none}
+      .q-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+    }
+    @media (min-width:1024px){
+      .stats{grid-template-columns:repeat(4,minmax(0,1fr))}
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <section id="loginScreen" class="card login">
+      <h1>Admin Login</h1>
+      <p class="sub">Enter the admin password to open the dashboard.</p>
+      <div class="field">
+        <label for="password">Password</label>
+        <input id="password" type="password">
+      </div>
+      <div class="field">
+        <button id="loginBtn" class="btn btn-primary" type="button">Login</button>
+      </div>
+    </section>
+
+    <section id="dashboard" class="hidden">
+      <div class="topbar">
+        <div>
+          <h1>Teacher Recruitment Admin</h1>
+          <p class="sub">JOSHI'S GROUP OF SCHOOLS</p>
+        </div>
+        <div class="inline">
+          <button class="btn btn-secondary" id="applicantsTabBtn" type="button">Applicants</button>
+          <button class="btn btn-secondary" id="questionsTabBtn" type="button">Manage Form Questions</button>
+          <button class="btn btn-secondary" id="settingsTabBtn" type="button">Settings</button>
+          <button class="btn btn-secondary" id="logoutBtn" type="button">Logout</button>
+        </div>
+      </div>
+
+      <div id="applicantsSection">
+        <div class="stats" id="stats"></div>
+        <div class="panel" style="margin-top:14px;">
+          <div class="filters">
+            <div class="field">
+              <label for="search">Search</label>
+              <input id="search" type="text" placeholder="Name or mobile number">
+            </div>
+            <div class="field">
+              <label for="subjectFilter">Subject</label>
+              <select id="subjectFilter"></select>
+            </div>
+            <div class="field">
+              <label for="experienceFilter">Experience</label>
+              <select id="experienceFilter">
+                <option value="">All</option>
+                <option value="0-2">0-2 Years</option>
+                <option value="3+">3+ Years</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="statusFilter">Status</label>
+              <select id="statusFilter"></select>
+            </div>
+          </div>
+          <div id="applications"></div>
+        </div>
+      </div>
+
+      <div id="questionsSection" class="hidden">
+        <div class="panel">
+          <div class="topbar">
+            <div>
+              <h2>Manage Form Questions</h2>
+              <p class="sub">Add, edit, reorder, activate, deactivate, require, or delete questions.</p>
+            </div>
+            <div class="inline">
+              <button class="btn btn-secondary" id="addQuestionBtn" type="button">Add Question</button>
+              <button class="btn btn-primary" id="saveQuestionsBtn" type="button">Save Questions</button>
+            </div>
+          </div>
+          <div class="q-list" id="questionList"></div>
+        </div>
+      </div>
+
+      <div id="settingsSection" class="hidden">
+        <div class="panel">
+          <h2>Settings</h2>
+          <p class="sub">Change the admin password.</p>
+          <div class="field">
+            <label for="currentPassword">Current Password</label>
+            <input id="currentPassword" type="password">
+          </div>
+          <div class="field">
+            <label for="newPassword">New Password</label>
+            <input id="newPassword" type="password">
+          </div>
+          <div class="field">
+            <button id="updatePasswordBtn" class="btn btn-primary" type="button">Update Password</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div id="backdrop" class="drawer-backdrop"></div>
+  <aside id="drawer" class="drawer"></aside>
+  <div id="toast" class="toast"></div>
+
+  <script>
+    const API_URL = 'https://script.google.com/macros/s/AKfycbyY9QQ3C8g-OFnUe0AmeH9ursYlKaFDkwMnnYBTy1Thcw2_Y9g8jgmVzEGRKJfS4VqsqA/exec';
+    const QUESTION_TYPES = [
+      ['short_text', 'Short text'],
+      ['long_text', 'Long text'],
+      ['number', 'Number'],
+      ['mobile_number', 'Mobile number'],
+      ['email', 'Email'],
+      ['date', 'Date'],
+      ['dropdown', 'Dropdown'],
+      ['multiple_choice', 'Multiple choice'],
+      ['multi_select', 'Multi-select / checkbox'],
+      ['file_upload', 'File upload']
+    ];
+
+    const state = {
+      token: '',
+      dashboard: null,
+      filters: { search: '', subject: '', experience: '', status: '' },
+      deletedQuestionIds: []
+    };
+
+    document.getElementById('loginBtn').addEventListener('click', login);
+    document.getElementById('logoutBtn').addEventListener('click', logout);
+    document.getElementById('applicantsTabBtn').addEventListener('click', () => switchTab('applicants'));
+    document.getElementById('questionsTabBtn').addEventListener('click', () => switchTab('questions'));
+    document.getElementById('settingsTabBtn').addEventListener('click', () => switchTab('settings'));
+    document.getElementById('addQuestionBtn').addEventListener('click', addQuestion);
+    document.getElementById('saveQuestionsBtn').addEventListener('click', saveQuestions);
+    document.getElementById('updatePasswordBtn').addEventListener('click', updatePassword);
+    document.getElementById('search').addEventListener('input', e => { state.filters.search = e.target.value; loadDashboard(); });
+    document.getElementById('subjectFilter').addEventListener('change', e => { state.filters.subject = e.target.value; loadDashboard(); });
+    document.getElementById('experienceFilter').addEventListener('change', e => { state.filters.experience = e.target.value; loadDashboard(); });
+    document.getElementById('statusFilter').addEventListener('change', e => { state.filters.status = e.target.value; loadDashboard(); });
+    document.getElementById('backdrop').addEventListener('click', closeDrawer);
+
+    async function login() {
+      try {
+        const password = document.getElementById('password').value;
+        const result = await apiPost('adminLogin', { password });
+        state.token = result.token;
+        state.dashboard = result.dashboard;
+        document.getElementById('loginScreen').classList.add('hidden');
+        document.getElementById('dashboard').classList.remove('hidden');
+        renderDashboard();
+        switchTab('applicants');
+      } catch (error) {
+        showToast(error.message || 'Login failed.', true);
+      }
+    }
+
+    async function logout() {
+      try {
+        await apiPost('adminLogout', { token: state.token });
+      } catch (error) {}
+      state.token = '';
+      state.dashboard = null;
+      document.getElementById('dashboard').classList.add('hidden');
+      document.getElementById('loginScreen').classList.remove('hidden');
+      closeDrawer();
+    }
+
+    function switchTab(tab) {
+      document.getElementById('applicantsSection').classList.toggle('hidden', tab !== 'applicants');
+      document.getElementById('questionsSection').classList.toggle('hidden', tab !== 'questions');
+      document.getElementById('settingsSection').classList.toggle('hidden', tab !== 'settings');
+    }
+
+    async function loadDashboard() {
+      try {
+        state.dashboard = await apiGet('adminDashboard', Object.assign({ token: state.token }, state.filters));
+        renderDashboard();
+      } catch (error) {
+        showToast(error.message || 'Could not load dashboard.', true);
+      }
+    }
+
+    function renderDashboard() {
+      renderStats();
+      renderFilters();
+      renderApplications();
+      renderQuestions();
+    }
+
+    function renderStats() {
+      const wrap = document.getElementById('stats');
+      wrap.innerHTML = '';
+      (state.dashboard.stats || []).forEach(stat => {
+        const btn = document.createElement('button');
+        btn.className = 'stat btn';
+        btn.type = 'button';
+        btn.innerHTML = `<span>${escapeHtml(stat.label)}</span><strong>${stat.count}</strong>`;
+        btn.addEventListener('click', () => {
+          state.filters.search = '';
+          state.filters.subject = stat.filters.subject || '';
+          state.filters.experience = stat.filters.experience || '';
+          state.filters.status = stat.filters.status || '';
+          syncFilters();
+          loadDashboard();
+        });
+        wrap.appendChild(btn);
+      });
+    }
+
+    function renderFilters() {
+      fillSelect('subjectFilter', [''].concat(state.dashboard.subjects || []), 'All');
+      fillSelect('statusFilter', [''].concat(state.dashboard.statuses || []), 'All');
+      syncFilters();
+    }
+
+    function syncFilters() {
+      document.getElementById('search').value = state.filters.search;
+      document.getElementById('subjectFilter').value = state.filters.subject;
+      document.getElementById('experienceFilter').value = state.filters.experience;
+      document.getElementById('statusFilter').value = state.filters.status;
+    }
+
+    function fillSelect(id, values, firstLabel) {
+      const select = document.getElementById(id);
+      select.innerHTML = '';
+      values.forEach((value, index) => {
+        const option = document.createElement('option');
+        option.value = value;
+        option.textContent = index === 0 ? firstLabel : value;
+        select.appendChild(option);
+      });
+    }
+
+    function renderApplications() {
+      const container = document.getElementById('applications');
+      const applications = state.dashboard.applications || [];
+      container.innerHTML = '';
+      if (!applications.length) {
+        container.innerHTML = '<div class="empty">No applicants found.</div>';
+        return;
+      }
+
+      const mobile = document.createElement('div');
+      mobile.className = 'mobile-list';
+      applications.forEach(app => mobile.appendChild(buildApplicationCard(app)));
+      container.appendChild(mobile);
+
+      const desktop = document.createElement('div');
+      desktop.className = 'desktop-table';
+      desktop.innerHTML = '<div class="table-wrap"><table><thead><tr><th>Name</th><th>Mobile Number</th><th>Subject</th><th>Qualification</th><th>Experience</th><th>City</th><th>Expected Salary</th><th>Status</th><th>Actions</th></tr></thead><tbody></tbody></table></div>';
+      const tbody = desktop.querySelector('tbody');
+      applications.forEach(app => {
+        const row = document.createElement('tr');
+        row.innerHTML = `<td>${escapeHtml(app.fullName || '')}</td><td>${escapeHtml(app.mobileNumber || '')}</td><td>${escapeHtml(app.subjectApplyingFor || '')}</td><td>${escapeHtml(app.qualification || '')}</td><td>${escapeHtml(String(app.teachingExperienceYears || ''))}</td><td>${escapeHtml(app.cityArea || '')}</td><td>${escapeHtml(String(app.expectedSalary || ''))}</td><td><span class="pill">${escapeHtml(app.status || 'New')}</span></td><td><button class="btn btn-secondary" type="button">Open</button></td>`;
+        row.querySelector('button').addEventListener('click', () => openApplicant(app.applicationId));
+        tbody.appendChild(row);
+      });
+      container.appendChild(desktop);
+    }
+
+    function buildApplicationCard(app) {
+      const card = document.createElement('div');
+      card.className = 'app-card';
+      card.innerHTML = `
+        <div class="app-head">
+          <div><strong>${escapeHtml(app.fullName || '')}</strong><div class="sub" style="margin-top:4px;">${escapeHtml(app.subjectApplyingFor || '')}</div></div>
+          <span class="pill">${escapeHtml(app.status || 'New')}</span>
+        </div>
+        <div class="app-grid">
+          <div><small>Mobile</small><div>${escapeHtml(app.mobileNumber || '')}</div></div>
+          <div><small>Experience</small><div>${escapeHtml(String(app.teachingExperienceYears || ''))}</div></div>
+          <div><small>Qualification</small><div>${escapeHtml(app.qualification || '')}</div></div>
+          <div><small>City</small><div>${escapeHtml(app.cityArea || '')}</div></div>
+          <div><small>Expected Salary</small><div>${escapeHtml(String(app.expectedSalary || ''))}</div></div>
+        </div>
+      `;
+      const btn = document.createElement('button');
+      btn.className = 'btn btn-secondary';
+      btn.type = 'button';
+      btn.style.marginTop = '14px';
+      btn.textContent = 'Open Applicant';
+      btn.addEventListener('click', () => openApplicant(app.applicationId));
+      card.appendChild(btn);
+      return card;
+    }
+
+    async function openApplicant(applicationId) {
+      try {
+        const applicant = await apiGet('applicantDetails', { token: state.token, applicationId });
+        renderApplicantDrawer(applicant);
+      } catch (error) {
+        showToast(error.message || 'Could not open applicant.', true);
+      }
+    }
+
+    function renderApplicantDrawer(applicant) {
+      const drawer = document.getElementById('drawer');
+      drawer.innerHTML = '';
+      const actions = [
+        applicant.callLink ? `<a class="btn btn-primary" href="${applicant.callLink}">Call</a>` : '',
+        applicant.whatsAppLink ? `<a class="btn btn-secondary" target="_blank" href="${applicant.whatsAppLink}">WhatsApp</a>` : '',
+        applicant.resumeDriveLink ? `<a class="btn btn-secondary" target="_blank" href="${applicant.resumeDriveLink}">View Resume</a>` : '',
+        applicant.resumeDriveLink ? `<a class="btn btn-secondary" target="_blank" href="${applicant.resumeDriveLink}">Download Resume</a>` : ''
+      ].join('');
+      drawer.innerHTML = `
+        <div class="topbar">
+          <div><h3>${escapeHtml(applicant.fullName || '')}</h3><p class="sub">${escapeHtml(applicant.subjectApplyingFor || '')}</p></div>
+          <button class="btn btn-secondary" id="closeDrawerBtn" type="button">Close</button>
+        </div>
+        <div class="answer"><small>Application Date/Time</small><div>${escapeHtml(formatDate(applicant.submittedAt))}</div></div>
+        <div class="inline" style="margin:12px 0 16px;flex-wrap:wrap">${actions}</div>
+        <div class="answers">${(applicant.allAnswers || []).map(answer => `<div class="answer"><small>${escapeHtml(answer.label)}</small><div>${escapeHtml(formatAnswer(answer.value, answer.key))}</div></div>`).join('')}</div>
+        <div class="field" style="margin-top:16px">
+          <label for="drawerStatus">Recruitment Status</label>
+          <select id="drawerStatus">${(state.dashboard.statuses || []).map(status => `<option value="${escapeHtml(status)}"${status === applicant.status ? ' selected' : ''}>${escapeHtml(status)}</option>`).join('')}</select>
+        </div>
+        <div class="field" style="margin-top:12px">
+          <label for="drawerRemarks">Remarks</label>
+          <textarea id="drawerRemarks">${escapeHtml(applicant.adminRemarks || '')}</textarea>
+        </div>
+        <div class="field" style="margin-top:12px">
+          <button class="btn btn-primary" id="saveApplicantBtn" type="button">Save / Update</button>
+        </div>
+      `;
+      document.getElementById('backdrop').classList.add('show');
+      drawer.classList.add('show');
+      document.getElementById('closeDrawerBtn').addEventListener('click', closeDrawer);
+      document.getElementById('saveApplicantBtn').addEventListener('click', async () => {
+        try {
+          const status = document.getElementById('drawerStatus').value;
+          const remarks = document.getElementById('drawerRemarks').value;
+          const result = await apiPost('updateApplicant', {
+            token: state.token,
+            applicationId: applicant.applicationId,
+            status,
+            remarks
+          });
+          showToast(result.message, false);
+          await loadDashboard();
+          await openApplicant(applicant.applicationId);
+        } catch (error) {
+          showToast(error.message || 'Could not update applicant.', true);
+        }
+      });
+    }
+
+    function closeDrawer() {
+      document.getElementById('backdrop').classList.remove('show');
+      document.getElementById('drawer').classList.remove('show');
+    }
+
+    function renderQuestions() {
+      const list = document.getElementById('questionList');
+      list.innerHTML = '';
+      (state.dashboard.questions || []).forEach(question => {
+        list.appendChild(buildQuestionEditor(question));
+      });
+    }
+
+    function buildQuestionEditor(question) {
+      const item = document.createElement('div');
+      item.className = 'q-item';
+      item.dataset.id = question.id;
+      item.innerHTML = `
+        <div class="q-grid">
+          <div class="field">
+            <label>Question Text</label>
+            <input class="q-text" type="text" value="${escapeAttr(question.text || '')}">
+          </div>
+          <div class="field">
+            <label>Question Type</label>
+            <select class="q-type">${QUESTION_TYPES.map(type => `<option value="${type[0]}"${type[0] === question.type ? ' selected' : ''}>${type[1]}</option>`).join('')}</select>
+          </div>
+          <div class="field">
+            <label>Options</label>
+            <input class="q-options" type="text" value="${escapeAttr((question.options || []).join(', '))}" placeholder="Comma separated options">
+          </div>
+          <div class="field">
+            <label>Order</label>
+            <input class="q-order" type="number" min="1" value="${Number(question.order || 1)}">
+          </div>
+        </div>
+        <div class="inline" style="margin-top:12px">
+          <label class="choice"><input class="q-required" type="checkbox"${question.required ? ' checked' : ''}> Required</label>
+          <label class="choice"><input class="q-active" type="checkbox"${question.active ? ' checked' : ''}> Active</label>
+          <button class="btn btn-danger q-delete" type="button">Delete</button>
+          <button class="btn btn-secondary q-up" type="button">Move Up</button>
+          <button class="btn btn-secondary q-down" type="button">Move Down</button>
+        </div>
+      `;
+      item.querySelector('.q-delete').addEventListener('click', () => {
+        state.deletedQuestionIds.push(item.dataset.id);
+        item.remove();
+      });
+      item.querySelector('.q-up').addEventListener('click', () => {
+        const prev = item.previousElementSibling;
+        if (prev) item.parentElement.insertBefore(item, prev);
+      });
+      item.querySelector('.q-down').addEventListener('click', () => {
+        const next = item.nextElementSibling;
+        if (next) item.parentElement.insertBefore(next, item);
+      });
+      return item;
+    }
+
+    function addQuestion() {
+      const question = {
+        id: 'q_' + Math.random().toString(36).slice(2, 10),
+        key: '',
+        text: 'New Question',
+        type: 'short_text',
+        required: false,
+        active: true,
+        fixed: false,
+        order: (document.querySelectorAll('#questionList .q-item').length + 1),
+        options: []
+      };
+      document.getElementById('questionList').appendChild(buildQuestionEditor(question));
+    }
+
+    async function saveQuestions() {
+      try {
+        const questions = [...document.querySelectorAll('#questionList .q-item')].map((item, index) => {
+          const existing = (state.dashboard.questions || []).find(question => question.id === item.dataset.id) || {};
+          return {
+            id: item.dataset.id,
+            key: existing.key || '',
+            text: item.querySelector('.q-text').value.trim() || 'Untitled Question',
+            type: item.querySelector('.q-type').value,
+            required: item.querySelector('.q-required').checked,
+            active: item.querySelector('.q-active').checked,
+            fixed: false,
+            order: Number(item.querySelector('.q-order').value || (index + 1)),
+            options: item.querySelector('.q-options').value ? item.querySelector('.q-options').value.split(',').map(value => value.trim()).filter(Boolean) : []
+          };
+        }).sort((a, b) => Number(a.order || 0) - Number(b.order || 0));
+
+        const result = await apiPost('saveQuestions', {
+          token: state.token,
+          questions,
+          deletedQuestionIds: state.deletedQuestionIds
+        });
+        state.deletedQuestionIds = [];
+        state.dashboard.questions = result.questions;
+        showToast(result.message, false);
+        renderQuestions();
+      } catch (error) {
+        showToast(error.message || 'Could not save questions.', true);
+      }
+    }
+
+    async function updatePassword() {
+      try {
+        const currentPassword = document.getElementById('currentPassword').value;
+        const newPassword = document.getElementById('newPassword').value;
+        const result = await apiPost('updatePassword', { token: state.token, currentPassword, newPassword });
+        document.getElementById('currentPassword').value = '';
+        document.getElementById('newPassword').value = '';
+        showToast(result.message, false);
+      } catch (error) {
+        showToast(error.message || 'Could not update password.', true);
+      }
+    }
+
+    async function apiGet(action, params = {}) {
+      const url = new URL(API_URL);
+      url.searchParams.set('action', action);
+      Object.keys(params).forEach(key => {
+        if (params[key] !== undefined && params[key] !== null && params[key] !== '') {
+          url.searchParams.set(key, params[key]);
+        }
+      });
+      const response = await fetch(url.toString());
+      const result = await response.json();
+      if (result.status !== 'success') throw new Error(result.message || 'Request failed');
+      return result.data;
+    }
+
+    async function apiPost(action, body = {}) {
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(Object.assign({ action }, body))
+      });
+      const result = await response.json();
+      if (result.status !== 'success') throw new Error(result.message || 'Request failed');
+      return result.data;
+    }
+
+    function showToast(message, isError) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.className = 'toast show ' + (isError ? 'error' : 'success');
+      clearTimeout(showToast.timer);
+      showToast.timer = setTimeout(() => toast.className = 'toast', 3200);
+    }
+
+    function formatDate(value) {
+      const date = new Date(value);
+      return Number.isNaN(date.getTime()) ? String(value || '') : date.toLocaleString();
+    }
+
+    function formatAnswer(value, key) {
+      if (key === 'resume_upload') return value ? 'Uploaded' : '-';
+      if (Array.isArray(value)) return value.join(', ');
+      if (value && typeof value === 'object' && value.url) return value.name || value.url;
+      return value === undefined || value === null || value === '' ? '-' : String(value);
+    }
+
+    function escapeHtml(value) {
+      return String(value || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+
+    function escapeAttr(value) {
+      return escapeHtml(value).replace(/`/g, '&#96;');
+    }
+  </script>
+</body>
+</html>
