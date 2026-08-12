@@ -38,7 +38,9 @@
     input,select,textarea{width:100%;padding:13px 14px;border:1px solid var(--border);border-radius:14px;background:#fbfdfc;color:var(--text)}
     textarea{min-height:110px;resize:vertical}
     .choice-group{display:grid;gap:10px}
-    .choice{display:flex;gap:10px;align-items:center;padding:12px 14px;border:1px solid var(--border);border-radius:14px;background:#fbfdfc}
+    .choice{display:flex;gap:12px;align-items:flex-start;padding:13px 14px;border:1px solid var(--border);border-radius:14px;background:#fbfdfc;cursor:pointer;min-height:52px}
+    .choice input{margin-top:2px;flex-shrink:0;width:18px;height:18px;accent-color:var(--primary)}
+    .choice span{display:block;line-height:1.45;word-break:break-word}
     .hint{font-size:13px;color:var(--muted)}
     .btn{border:none;border-radius:14px;padding:14px 16px;cursor:pointer}
     .btn-primary{background:var(--primary);color:#fff;font-weight:700}
@@ -148,7 +150,7 @@
         (question.options || []).forEach(option => {
           const label = document.createElement('label');
           label.className = 'choice';
-          label.innerHTML = `<input type="radio" name="${question.key}" value="${escapeHtml(option)}"> <span>${escapeHtml(option)}</span>`;
+          label.innerHTML = `<input type="radio" name="${question.key}" value="${escapeAttr(option)}"><span>${escapeHtml(option)}</span>`;
           wrap.appendChild(label);
         });
         return wrap;
@@ -159,7 +161,7 @@
         (question.options || []).forEach(option => {
           const label = document.createElement('label');
           label.className = 'choice';
-          label.innerHTML = `<input type="checkbox" name="${question.key}" value="${escapeHtml(option)}"> <span>${escapeHtml(option)}</span>`;
+          label.innerHTML = `<input type="checkbox" name="${question.key}" value="${escapeAttr(option)}"><span>${escapeHtml(option)}</span>`;
           wrap.appendChild(label);
         });
         return wrap;
@@ -269,6 +271,11 @@
     function escapeHtml(value) {
       return String(value || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
     }
+
+    function escapeAttr(value) {
+      return escapeHtml(value).replace(/`/g, '&#96;');
+    }
   </script>
 </body>
 </html>
+
