@@ -19,7 +19,7 @@
     *{box-sizing:border-box}
     body{margin:0;padding:14px;background:linear-gradient(180deg,#f7fbf9 0%,var(--bg) 100%);font-family:Segoe UI,Tahoma,sans-serif;color:var(--text)}
     .wrap{max-width:1200px;margin:0 auto}
-    .card,.panel,.drawer{background:var(--card);border:1px solid var(--border);border-radius:20px;box-shadow:0 12px 34px rgba(24,52,42,.08)}
+    .card,.panel,.modal{background:var(--card);border:1px solid var(--border);border-radius:20px;box-shadow:0 12px 34px rgba(24,52,42,.08)}
     .card,.panel{padding:16px}
     h1,h2,h3,p{margin:0}
     .sub{margin-top:8px;color:var(--muted)}
@@ -53,10 +53,9 @@
     th,td{padding:12px;border-bottom:1px solid var(--border);text-align:left;vertical-align:top}
     th{background:#f6faf8;color:var(--muted);font-size:12px;text-transform:uppercase}
     .table-wrap{overflow:auto;border:1px solid var(--border);border-radius:16px}
-    .drawer-backdrop{position:fixed;inset:0;background:rgba(18,42,34,.4);display:none;z-index:10}
-    .drawer-backdrop.show{display:block}
-    .drawer{position:fixed;right:0;top:0;bottom:0;width:min(100%,460px);padding:18px;overflow:auto;transform:translateX(100%);transition:transform .2s ease;z-index:11}
-    .drawer.show{transform:translateX(0)}
+    .modal-backdrop{position:fixed;inset:0;background:rgba(18,42,34,.4);display:none;align-items:center;justify-content:center;padding:16px;z-index:10}
+    .modal-backdrop.show{display:flex}
+    .modal{width:min(100%,560px);max-height:min(88vh,820px);overflow:auto;padding:18px}
     .answers,.q-list{display:grid;gap:12px}
     .answer,.q-item{padding:14px;border:1px solid var(--border);border-radius:16px;background:#fbfdfc}
     .section-tabs{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
@@ -68,13 +67,13 @@
     .empty{padding:24px;border:1px dashed var(--border);border-radius:16px;text-align:center;color:var(--muted)}
     @media (min-width:768px){
       body{padding:20px}
-      .stats{grid-template-columns:repeat(3,minmax(0,1fr))}
+      .stats{grid-template-columns:repeat(2,minmax(0,1fr))}
       .desktop-table{display:block}
       .mobile-list{display:none}
       .q-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
     }
     @media (min-width:1024px){
-      .stats{grid-template-columns:repeat(4,minmax(0,1fr))}
+      .stats{grid-template-columns:repeat(2,minmax(0,1fr))}
     }
   </style>
 </head>
@@ -115,20 +114,12 @@
               <input id="search" type="text" placeholder="Name or mobile number">
             </div>
             <div class="field">
-              <label for="subjectFilter">Subject</label>
-              <select id="subjectFilter"></select>
-            </div>
-            <div class="field">
-              <label for="experienceFilter">Experience</label>
-              <select id="experienceFilter">
-                <option value="">All</option>
-                <option value="0-2">0-2 Years</option>
-                <option value="3+">3+ Years</option>
-              </select>
-            </div>
-            <div class="field">
               <label for="statusFilter">Status</label>
               <select id="statusFilter"></select>
+            </div>
+            <div id="dynamicFilters" class="filters" style="width:100%;margin:0;"></div>
+            <div class="field" style="flex:0 0 auto;align-self:end;">
+              <button id="applyFiltersBtn" class="btn btn-primary" type="button">Search</button>
             </div>
           </div>
           <div id="applications"></div>
@@ -171,8 +162,9 @@
     </section>
   </div>
 
-  <div id="backdrop" class="drawer-backdrop"></div>
-  <aside id="drawer" class="drawer"></aside>
+  <div id="modalBackdrop" class="modal-backdrop">
+    <div id="modal" class="modal"></div>
+  </div>
   <div id="toast" class="toast"></div>
 
   <script>
@@ -193,7 +185,7 @@
     const state = {
       token: '',
       dashboard: null,
-      filters: { search: '', subject: '', experience: '', status: '' },
+      filters: { search: '', status: '', questionFilters: {} },
       deletedQuestionIds: []
     };
 
@@ -205,11 +197,12 @@
     document.getElementById('addQuestionBtn').addEventListener('click', addQuestion);
     document.getElementById('saveQuestionsBtn').addEventListener('click', saveQuestions);
     document.getElementById('updatePasswordBtn').addEventListener('click', updatePassword);
-    document.getElementById('search').addEventListener('input', e => { state.filters.search = e.target.value; loadDashboard(); });
-    document.getElementById('subjectFilter').addEventListener('change', e => { state.filters.subject = e.target.value; loadDashboard(); });
-    document.getElementById('experienceFilter').addEventListener('change', e => { state.filters.experience = e.target.value; loadDashboard(); });
-    document.getElementById('statusFilter').addEventListener('change', e => { state.filters.status = e.target.value; loadDashboard(); });
-    document.getElementById('backdrop').addEventListener('click', closeDrawer);
+    document.getElementById('search').addEventListener('input', e => { state.filters.search = e.target.value; });
+    document.getElementById('statusFilter').addEventListener('change', e => { state.filters.status = e.target.value; });
+    document.getElementById('applyFiltersBtn').addEventListener('click', applyDynamicFilters);
+    document.getElementById('modalBackdrop').addEventListener('click', e => {
+      if (e.target.id === 'modalBackdrop') closeDrawer();
+    });
 
     async function login() {
       try {
@@ -245,7 +238,12 @@
 
     async function loadDashboard() {
       try {
-        state.dashboard = await apiGet('adminDashboard', Object.assign({ token: state.token }, state.filters));
+        state.dashboard = await apiGet('adminDashboard', {
+          token: state.token,
+          search: state.filters.search,
+          status: state.filters.status,
+          filterJson: JSON.stringify(state.filters.questionFilters || {})
+        });
         renderDashboard();
       } catch (error) {
         showToast(error.message || 'Could not load dashboard.', true);
@@ -269,9 +267,8 @@
         btn.innerHTML = `<span>${escapeHtml(stat.label)}</span><strong>${stat.count}</strong>`;
         btn.addEventListener('click', () => {
           state.filters.search = '';
-          state.filters.subject = stat.filters.subject || '';
-          state.filters.experience = stat.filters.experience || '';
           state.filters.status = stat.filters.status || '';
+          state.filters.questionFilters = {};
           syncFilters();
           loadDashboard();
         });
@@ -280,16 +277,53 @@
     }
 
     function renderFilters() {
-      fillSelect('subjectFilter', [''].concat(state.dashboard.subjects || []), 'All');
       fillSelect('statusFilter', [''].concat(state.dashboard.statuses || []), 'All');
+      renderDynamicFilters();
       syncFilters();
     }
 
     function syncFilters() {
       document.getElementById('search').value = state.filters.search;
-      document.getElementById('subjectFilter').value = state.filters.subject;
-      document.getElementById('experienceFilter').value = state.filters.experience;
       document.getElementById('statusFilter').value = state.filters.status;
+      Object.keys(state.filters.questionFilters || {}).forEach(key => {
+        const input = document.querySelector(`[data-filter-key="${key}"]`);
+        if (input) {
+          input.value = state.filters.questionFilters[key];
+        }
+      });
+    }
+
+    function renderDynamicFilters() {
+      const wrap = document.getElementById('dynamicFilters');
+      wrap.innerHTML = '';
+      (state.dashboard.filterQuestions || []).forEach(question => {
+        const field = document.createElement('div');
+        field.className = 'field';
+        field.style.flex = '1 1 180px';
+        const label = document.createElement('label');
+        label.textContent = question.text;
+        field.appendChild(label);
+        const select = document.createElement('select');
+        select.dataset.filterKey = question.key;
+        select.innerHTML = '<option value="">All</option>';
+        (state.dashboard.filterOptions[question.key] || []).forEach(option => {
+          const item = document.createElement('option');
+          item.value = option;
+          item.textContent = option;
+          select.appendChild(item);
+        });
+        field.appendChild(select);
+        wrap.appendChild(field);
+      });
+    }
+
+    function applyDynamicFilters() {
+      const questionFilters = {};
+      document.querySelectorAll('[data-filter-key]').forEach(input => {
+        questionFilters[input.dataset.filterKey] = input.value;
+      });
+      state.filters.questionFilters = questionFilters;
+      loadDashboard();
     }
 
     function fillSelect(id, values, firstLabel) {
@@ -366,7 +400,7 @@
     }
 
     function renderApplicantDrawer(applicant) {
-      const drawer = document.getElementById('drawer');
+      const drawer = document.getElementById('modal');
       drawer.innerHTML = '';
       const actions = [
         applicant.callLink ? `<a class="btn btn-primary" href="${applicant.callLink}">Call</a>` : '',
@@ -394,8 +428,7 @@
           <button class="btn btn-primary" id="saveApplicantBtn" type="button">Save / Update</button>
         </div>
       `;
-      document.getElementById('backdrop').classList.add('show');
-      drawer.classList.add('show');
+      document.getElementById('modalBackdrop').classList.add('show');
       document.getElementById('closeDrawerBtn').addEventListener('click', closeDrawer);
       document.getElementById('saveApplicantBtn').addEventListener('click', async () => {
         try {
@@ -417,8 +450,7 @@
     }
 
     function closeDrawer() {
-      document.getElementById('backdrop').classList.remove('show');
-      document.getElementById('drawer').classList.remove('show');
+      document.getElementById('modalBackdrop').classList.remove('show');
     }
 
     function renderQuestions() {
