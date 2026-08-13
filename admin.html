@@ -468,7 +468,6 @@
       const item = document.createElement('div');
       item.className = 'q-item';
       item.dataset.id = question.id;
-      const isCore = ['full_name', 'mobile_number', 'subject_applying_for', 'resume_upload'].includes(question.key);
       item.innerHTML = `
         <div class="q-grid">
           <div class="field">
@@ -477,7 +476,7 @@
           </div>
           <div class="field">
             <label>Question Type</label>
-            <select class="q-type"${isCore ? ' disabled' : ''}>${QUESTION_TYPES.map(type => `<option value="${type[0]}"${type[0] === question.type ? ' selected' : ''}>${type[1]}</option>`).join('')}</select>
+            <select class="q-type">${QUESTION_TYPES.map(type => `<option value="${type[0]}"${type[0] === question.type ? ' selected' : ''}>${type[1]}</option>`).join('')}</select>
           </div>
           <div class="field">
             <label>Options</label>
@@ -489,20 +488,17 @@
           </div>
         </div>
         <div class="inline" style="margin-top:12px">
-          <label class="choice"><input class="q-required" type="checkbox"${question.required ? ' checked' : ''}${isCore ? ' disabled' : ''}> Required</label>
-          <label class="choice"><input class="q-active" type="checkbox"${question.active ? ' checked' : ''}${isCore ? ' disabled' : ''}> Active</label>
-          ${isCore ? '<span class="pill">Core field</span>' : '<button class="btn btn-danger q-delete" type="button">Delete</button>'}
+          <label class="choice"><input class="q-required" type="checkbox"${question.required ? ' checked' : ''}> Required</label>
+          <label class="choice"><input class="q-active" type="checkbox"${question.active ? ' checked' : ''}> Active</label>
+          <button class="btn btn-danger q-delete" type="button">Delete</button>
           <button class="btn btn-secondary q-up" type="button">Move Up</button>
           <button class="btn btn-secondary q-down" type="button">Move Down</button>
         </div>
       `;
-      const deleteBtn = item.querySelector('.q-delete');
-      if (deleteBtn) {
-        deleteBtn.addEventListener('click', () => {
-          state.deletedQuestionIds.push(item.dataset.id);
-          item.remove();
-        });
-      }
+      item.querySelector('.q-delete').addEventListener('click', () => {
+        state.deletedQuestionIds.push(item.dataset.id);
+        item.remove();
+      });
       item.querySelector('.q-up').addEventListener('click', () => {
         const prev = item.previousElementSibling;
         if (prev) item.parentElement.insertBefore(item, prev);
@@ -638,4 +634,3 @@
   </script>
 </body>
 </html>
-
