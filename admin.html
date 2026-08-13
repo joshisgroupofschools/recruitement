@@ -65,6 +65,7 @@
     .toast.error{color:var(--danger)}
     .q-grid{display:grid;gap:10px}
     .empty{padding:24px;border:1px dashed var(--border);border-radius:16px;text-align:center;color:var(--muted)}
+    .btn[disabled]{opacity:.65;cursor:not-allowed}
     @media (min-width:768px){
       body{padding:20px}
       .stats{grid-template-columns:repeat(2,minmax(0,1fr))}
@@ -238,11 +239,13 @@
 
     async function loadDashboard() {
       try {
-        state.dashboard = await apiGet('adminDashboard', {
+        state.dashboard = await apiPost('adminDashboard', {
           token: state.token,
-          search: state.filters.search,
-          status: state.filters.status,
-          filterJson: JSON.stringify(state.filters.questionFilters || {})
+          filters: {
+            search: state.filters.search,
+            status: state.filters.status,
+            questionFilters: state.filters.questionFilters || {}
+          }
         });
         renderDashboard();
       } catch (error) {
@@ -392,7 +395,7 @@
 
     async function openApplicant(applicationId) {
       try {
-        const applicant = await apiGet('applicantDetails', { token: state.token, applicationId });
+        const applicant = await apiPost('applicantDetails', { token: state.token, applicationId });
         renderApplicantDrawer(applicant);
       } catch (error) {
         showToast(error.message || 'Could not open applicant.', true);
@@ -465,6 +468,7 @@
       const item = document.createElement('div');
       item.className = 'q-item';
       item.dataset.id = question.id;
+      const isCore = ['full_name', 'mobile_number', 'subject_applying_for', 'resume_upload'].includes(question.key);
       item.innerHTML = `
         <div class="q-grid">
           <div class="field">
@@ -473,7 +477,7 @@
           </div>
           <div class="field">
             <label>Question Type</label>
-            <select class="q-type">${QUESTION_TYPES.map(type => `<option value="${type[0]}"${type[0] === question.type ? ' selected' : ''}>${type[1]}</option>`).join('')}</select>
+            <select class="q-type"${isCore ? ' disabled' : ''}>${QUESTION_TYPES.map(type => `<option value="${type[0]}"${type[0] === question.type ? ' selected' : ''}>${type[1]}</option>`).join('')}</select>
           </div>
           <div class="field">
             <label>Options</label>
@@ -485,17 +489,20 @@
           </div>
         </div>
         <div class="inline" style="margin-top:12px">
-          <label class="choice"><input class="q-required" type="checkbox"${question.required ? ' checked' : ''}> Required</label>
-          <label class="choice"><input class="q-active" type="checkbox"${question.active ? ' checked' : ''}> Active</label>
-          <button class="btn btn-danger q-delete" type="button">Delete</button>
+          <label class="choice"><input class="q-required" type="checkbox"${question.required ? ' checked' : ''}${isCore ? ' disabled' : ''}> Required</label>
+          <label class="choice"><input class="q-active" type="checkbox"${question.active ? ' checked' : ''}${isCore ? ' disabled' : ''}> Active</label>
+          ${isCore ? '<span class="pill">Core field</span>' : '<button class="btn btn-danger q-delete" type="button">Delete</button>'}
           <button class="btn btn-secondary q-up" type="button">Move Up</button>
           <button class="btn btn-secondary q-down" type="button">Move Down</button>
         </div>
       `;
-      item.querySelector('.q-delete').addEventListener('click', () => {
-        state.deletedQuestionIds.push(item.dataset.id);
-        item.remove();
-      });
+      const deleteBtn = item.querySelector('.q-delete');
+      if (deleteBtn) {
+        deleteBtn.addEventListener('click', () => {
+          state.deletedQuestionIds.push(item.dataset.id);
+          item.remove();
+        });
+      }
       item.querySelector('.q-up').addEventListener('click', () => {
         const prev = item.previousElementSibling;
         if (prev) item.parentElement.insertBefore(item, prev);
@@ -523,7 +530,9 @@
     }
 
     async function saveQuestions() {
+      const saveBtn = document.getElementById('saveQuestionsBtn');
       try {
+        saveBtn.disabled = true;
         const questions = [...document.querySelectorAll('#questionList .q-item')].map((item, index) => {
           const existing = (state.dashboard.questions || []).find(question => question.id === item.dataset.id) || {};
           return {
@@ -545,16 +554,19 @@
           deletedQuestionIds: state.deletedQuestionIds
         });
         state.deletedQuestionIds = [];
-        state.dashboard.questions = result.questions;
         showToast(result.message, false);
-        renderQuestions();
+        await loadDashboard();
       } catch (error) {
         showToast(error.message || 'Could not save questions.', true);
+      } finally {
+        saveBtn.disabled = false;
       }
     }
 
     async function updatePassword() {
+      const button = document.getElementById('updatePasswordBtn');
       try {
+        button.disabled = true;
         const currentPassword = document.getElementById('currentPassword').value;
         const newPassword = document.getElementById('newPassword').value;
         const result = await apiPost('updatePassword', { token: state.token, currentPassword, newPassword });
@@ -563,6 +575,8 @@
         showToast(result.message, false);
       } catch (error) {
         showToast(error.message || 'Could not update password.', true);
+      } finally {
+        button.disabled = false;
       }
     }
 
@@ -586,6 +600,9 @@
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify(Object.assign({ action }, body))
       });
+      if (!response.ok) {
+        throw new Error('Network request failed.');
+      }
       const result = await response.json();
       if (result.status !== 'success') throw new Error(result.message || 'Request failed');
       return result.data;
@@ -621,3 +638,4 @@
   </script>
 </body>
 </html>
+
