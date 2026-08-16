@@ -15,6 +15,7 @@
       --brand-dark:#154132;
       --danger:#b74747;
       --shadow:0 18px 36px rgba(35,49,44,.08);
+      --soft:#f8f4eb;
     }
     *{box-sizing:border-box}
     body{
@@ -37,8 +38,8 @@
     h1,h2,h3,p{margin:0}
     .sub{margin-top:8px;color:var(--muted);line-height:1.55}
     .hidden{display:none!important}
-    input,textarea,button{font:inherit}
-    input,textarea{
+    input,textarea,select,button{font:inherit}
+    input,textarea,select{
       width:100%;
       padding:13px 14px;
       border:1px solid var(--line);
@@ -66,6 +67,36 @@
     .topbar,.modal-top{justify-content:space-between;align-items:flex-start}
     .toolbar,.tabbar{margin-top:14px}
     .tab-btn.active{background:var(--brand);color:#fff}
+    .logout-fixed{
+      position:sticky;
+      top:10px;
+      z-index:5;
+      display:flex;
+      justify-content:flex-end;
+      margin-bottom:12px;
+    }
+    .stats{
+      display:grid;
+      gap:12px;
+      margin-top:16px;
+    }
+    .stat-card{
+      border:1px solid var(--line);
+      border-radius:18px;
+      background:linear-gradient(180deg,#fff,#f8f4eb);
+      padding:16px;
+      cursor:pointer;
+      text-align:left;
+    }
+    .stat-card strong{
+      display:block;
+      margin-top:8px;
+      font-size:28px;
+    }
+    .stat-card.active{
+      border-color:var(--brand);
+      box-shadow:0 0 0 3px rgba(29,90,69,.10);
+    }
     .role-helper{
       margin-top:14px;
       padding:14px;
@@ -114,7 +145,7 @@
       border-radius:18px;
       background:#fff;
     }
-    table{width:100%;border-collapse:collapse;min-width:980px}
+    table{width:100%;border-collapse:collapse;min-width:960px}
     th,td{
       padding:14px 12px;
       border-bottom:1px solid var(--line);
@@ -130,6 +161,39 @@
     }
     tbody tr{cursor:pointer}
     tbody tr:hover{background:#fbfaf7}
+    .mobile-list{
+      display:grid;
+      gap:12px;
+      margin-top:16px;
+    }
+    .app-card{
+      border:1px solid var(--line);
+      border-radius:18px;
+      background:#fff;
+      padding:14px;
+      cursor:pointer;
+    }
+    .app-card h3{font-size:18px}
+    .app-meta{
+      display:grid;
+      gap:10px;
+      margin-top:12px;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+    }
+    .app-meta small,.detail small{
+      display:block;
+      color:var(--muted);
+      margin-bottom:4px;
+    }
+    .pill{
+      display:inline-flex;
+      padding:8px 12px;
+      border-radius:999px;
+      background:#e7f1eb;
+      color:var(--brand-dark);
+      font-size:12px;
+      font-weight:700;
+    }
     .empty{
       margin-top:16px;
       padding:24px;
@@ -166,7 +230,6 @@
       border-radius:18px;
       background:#fff;
     }
-    .detail small{display:block;color:var(--muted);margin-bottom:6px}
     .contact-actions{
       display:flex;
       gap:12px;
@@ -201,10 +264,14 @@
     }
     .toast.show{display:block}
     .toast.error{color:var(--danger)}
+    .desktop-only{display:none}
     @media (min-width:768px){
       body{padding:22px}
       .detail-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
       .role-line{align-items:center;flex-wrap:nowrap}
+      .stats{grid-template-columns:repeat(4,minmax(0,1fr))}
+      .desktop-only{display:block}
+      .mobile-list{display:none}
     }
   </style>
 </head>
@@ -223,13 +290,16 @@
     </section>
 
     <section id="dashboard" class="hidden">
+      <div class="logout-fixed">
+        <button id="logoutBtn" class="btn btn-secondary" type="button">Logout</button>
+      </div>
+
       <div class="panel">
         <div class="topbar">
           <div>
             <h1>Teacher Recruitment Admin</h1>
             <p class="sub">Manage roles and review applicant details.</p>
           </div>
-          <button id="logoutBtn" class="btn btn-secondary" type="button">Logout</button>
         </div>
 
         <div class="tabbar">
@@ -242,14 +312,25 @@
         <div class="topbar">
           <div>
             <h2>Applicants Table</h2>
-            <p class="sub">Click any row to see full details, call, WhatsApp and remarks.</p>
+            <p class="sub">Click any row to see full details, update status, call, WhatsApp and remarks.</p>
+          </div>
+          <div class="toolbar" style="margin-top:0;">
+            <button id="exportBtn" class="btn btn-secondary" type="button">Export Excel</button>
           </div>
         </div>
 
+        <div id="stats" class="stats"></div>
+
         <div class="toolbar">
-          <div class="field" style="flex:1 1 320px;">
+          <div class="field" style="flex:1 1 260px;">
             <label for="searchInput">Search</label>
             <input id="searchInput" type="text" placeholder="Name, mobile, role or area">
+          </div>
+          <div class="field" style="flex:1 1 220px;">
+            <label for="statusFilter">Status</label>
+            <select id="statusFilter">
+              <option value="">All statuses</option>
+            </select>
           </div>
           <div style="align-self:end;">
             <button id="searchBtn" class="btn btn-primary" type="button">Search</button>
@@ -292,8 +373,9 @@
     const API_URL = 'https://script.google.com/macros/s/AKfycbyY9QQ3C8g-OFnUe0AmeH9ursYlKaFDkwMnnYBTy1Thcw2_Y9g8jgmVzEGRKJfS4VqsqA/exec';
     const state = {
       token: '',
-      dashboard: { roles: [], applications: [] },
-      search: ''
+      dashboard: { roles: [], applications: [], stats: [], statuses: [] },
+      search: '',
+      status: ''
     };
 
     document.getElementById('loginBtn').addEventListener('click', login);
@@ -303,6 +385,10 @@
     document.getElementById('addBulkRolesBtn').addEventListener('click', addBulkRoles);
     document.getElementById('saveRolesBtn').addEventListener('click', saveRoles);
     document.getElementById('searchBtn').addEventListener('click', loadDashboard);
+    document.getElementById('exportBtn').addEventListener('click', exportExcel);
+    document.getElementById('statusFilter').addEventListener('change', event => {
+      state.status = event.target.value;
+    });
     document.getElementById('searchInput').addEventListener('keydown', event => {
       if (event.key === 'Enter') {
         event.preventDefault();
@@ -320,6 +406,7 @@
         });
         state.token = result.token;
         state.dashboard = result.dashboard;
+        state.status = '';
         document.getElementById('password').value = '';
         document.getElementById('loginScreen').classList.add('hidden');
         document.getElementById('dashboard').classList.remove('hidden');
@@ -351,9 +438,11 @@
     async function loadDashboard() {
       try {
         state.search = document.getElementById('searchInput').value.trim();
+        state.status = document.getElementById('statusFilter').value;
         state.dashboard = await apiPost('adminDashboard', {
           token: state.token,
-          search: state.search
+          search: state.search,
+          status: state.status
         });
         renderDashboard();
       } catch (error) {
@@ -362,8 +451,37 @@
     }
 
     function renderDashboard() {
+      renderStats();
+      renderStatusFilter();
       renderRoles();
       renderApplications();
+    }
+
+    function renderStats() {
+      const wrap = document.getElementById('stats');
+      wrap.innerHTML = '';
+      (state.dashboard.stats || []).forEach(stat => {
+        const card = document.createElement('button');
+        card.type = 'button';
+        card.className = 'stat-card btn' + ((state.status || '') === (stat.status || '') ? ' active' : '');
+        card.innerHTML = `<span>${escapeHtml(stat.label)}</span><strong>${Number(stat.count || 0)}</strong>`;
+        card.addEventListener('click', async () => {
+          state.status = stat.status || '';
+          document.getElementById('statusFilter').value = state.status;
+          await loadDashboard();
+        });
+        wrap.appendChild(card);
+      });
+    }
+
+    function renderStatusFilter() {
+      const select = document.getElementById('statusFilter');
+      const current = state.status || '';
+      select.innerHTML = '<option value="">All statuses</option>';
+      (state.dashboard.statuses || []).forEach(status => {
+        select.appendChild(new Option(status, status));
+      });
+      select.value = current;
     }
 
     function renderRoles() {
@@ -393,24 +511,15 @@
       item.querySelector('.role-delete').addEventListener('click', () => {
         item.remove();
       });
-      item.addEventListener('dragstart', () => {
-        item.classList.add('dragging');
-      });
-      item.addEventListener('dragend', () => {
-        item.classList.remove('dragging');
-      });
+      item.addEventListener('dragstart', () => item.classList.add('dragging'));
+      item.addEventListener('dragend', () => item.classList.remove('dragging'));
       item.addEventListener('dragover', event => {
         event.preventDefault();
         const dragging = document.querySelector('.role-item.dragging');
         if (!dragging || dragging === item) return;
         const box = item.getBoundingClientRect();
-        const shouldInsertAfter = event.clientY > box.top + box.height / 2;
-        const parent = item.parentElement;
-        if (shouldInsertAfter) {
-          parent.insertBefore(dragging, item.nextSibling);
-        } else {
-          parent.insertBefore(dragging, item);
-        }
+        const after = event.clientY > box.top + box.height / 2;
+        item.parentElement.insertBefore(dragging, after ? item.nextSibling : item);
       });
       return item;
     }
@@ -478,9 +587,34 @@
         return;
       }
 
-      const tableWrap = document.createElement('div');
-      tableWrap.className = 'table-wrap';
-      tableWrap.innerHTML = `
+      const mobile = document.createElement('div');
+      mobile.className = 'mobile-list';
+      applications.forEach(applicant => {
+        const card = document.createElement('div');
+        card.className = 'app-card';
+        card.innerHTML = `
+          <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start;">
+            <div>
+              <h3>${escapeHtml(applicant.fullName || '')}</h3>
+              <div class="sub">${escapeHtml(applicant.roleApplyingFor || '')}</div>
+            </div>
+            <span class="pill">${escapeHtml(applicant.status || 'New')}</span>
+          </div>
+          <div class="app-meta">
+            <div><small>Mobile</small><div>${escapeHtml(applicant.mobileNumber || '')}</div></div>
+            <div><small>Area</small><div>${escapeHtml(applicant.residentialArea || '')}</div></div>
+            <div><small>Experience</small><div>${escapeHtml(applicant.teachingExperience || '')}</div></div>
+            <div><small>Date</small><div>${escapeHtml(applicant.submittedDate || '')}</div></div>
+          </div>
+        `;
+        card.addEventListener('click', () => openApplicant(applicant.applicationId));
+        mobile.appendChild(card);
+      });
+      wrap.appendChild(mobile);
+
+      const desktop = document.createElement('div');
+      desktop.className = 'table-wrap desktop-only';
+      desktop.innerHTML = `
         <table>
           <thead>
             <tr>
@@ -491,13 +625,14 @@
               <th>Educational Qualification</th>
               <th>Teaching Experience</th>
               <th>Current or Previous School</th>
-              <th>Submitted At</th>
+              <th>Status</th>
+              <th>Date</th>
             </tr>
           </thead>
           <tbody></tbody>
         </table>
       `;
-      const tbody = tableWrap.querySelector('tbody');
+      const tbody = desktop.querySelector('tbody');
       applications.forEach(applicant => {
         const row = document.createElement('tr');
         row.innerHTML = `
@@ -508,12 +643,13 @@
           <td>${escapeHtml(applicant.educationalQualification || '')}</td>
           <td>${escapeHtml(applicant.teachingExperience || '')}</td>
           <td>${escapeHtml(applicant.currentPreviousSchool || '')}</td>
-          <td>${escapeHtml(formatDate(applicant.submittedAt))}</td>
+          <td><span class="pill">${escapeHtml(applicant.status || 'New')}</span></td>
+          <td>${escapeHtml(applicant.submittedDate || '')}</td>
         `;
         row.addEventListener('click', () => openApplicant(applicant.applicationId));
         tbody.appendChild(row);
       });
-      wrap.appendChild(tableWrap);
+      wrap.appendChild(desktop);
     }
 
     async function openApplicant(applicationId) {
@@ -545,7 +681,7 @@
           <div class="detail"><small>Educational Qualification</small><div>${escapeHtml(applicant.educationalQualification || '')}</div></div>
           <div class="detail"><small>Teaching Experience</small><div>${escapeHtml(applicant.teachingExperience || '')}</div></div>
           <div class="detail"><small>Current or Previous School</small><div>${escapeHtml(applicant.currentPreviousSchool || '')}</div></div>
-          <div class="detail"><small>Submitted At</small><div>${escapeHtml(formatDate(applicant.submittedAt))}</div></div>
+          <div class="detail"><small>Application Date</small><div>${escapeHtml(applicant.submittedDate || '')}</div></div>
         </div>
 
         <div class="contact-actions">
@@ -554,27 +690,35 @@
         </div>
 
         <div class="field" style="margin-top:18px;">
+          <label for="applicantStatus">Status</label>
+          <select id="applicantStatus">
+            ${(state.dashboard.statuses || []).map(status => `<option value="${escapeAttr(status)}"${status === applicant.status ? ' selected' : ''}>${escapeHtml(status)}</option>`).join('')}
+          </select>
+        </div>
+        <div class="field" style="margin-top:12px;">
           <label for="applicantRemark">Remark</label>
           <textarea id="applicantRemark">${escapeHtml(applicant.adminRemarks || '')}</textarea>
         </div>
         <div class="toolbar">
-          <button id="saveRemarkBtn" class="btn btn-primary" type="button">Save Remark</button>
+          <button id="saveApplicantBtn" class="btn btn-primary" type="button">Save</button>
         </div>
       `;
 
       document.getElementById('modalBackdrop').classList.add('show');
       document.getElementById('closeModalBtn').addEventListener('click', closeModal);
-      document.getElementById('saveRemarkBtn').addEventListener('click', async () => {
+      document.getElementById('saveApplicantBtn').addEventListener('click', async () => {
         try {
-          const result = await apiPost('updateApplicantRemark', {
+          const result = await apiPost('updateApplicant', {
             token: state.token,
             applicationId: applicant.applicationId,
+            status: document.getElementById('applicantStatus').value,
             remarks: document.getElementById('applicantRemark').value
           });
           showToast(result.message, false);
           await loadDashboard();
+          closeModal();
         } catch (error) {
-          showToast(error.message || 'Could not save remark.', true);
+          showToast(error.message || 'Could not save applicant.', true);
         }
       });
     }
@@ -582,6 +726,56 @@
     function closeModal() {
       document.getElementById('modalBackdrop').classList.remove('show');
       document.getElementById('modal').innerHTML = '';
+    }
+
+    function exportExcel() {
+      const rows = state.dashboard.applications || [];
+      if (!rows.length) {
+        showToast('No applicants to export.', true);
+        return;
+      }
+      const headers = [
+        'Role Applying For',
+        'Full Name',
+        'Mobile Number',
+        'Residential Area',
+        'Educational Qualification',
+        'Teaching Experience',
+        'Current or Previous School',
+        'Status',
+        'Date',
+        'Remark'
+      ];
+      const csv = [
+        headers.join(','),
+        ...rows.map(row => [
+          row.roleApplyingFor,
+          row.fullName,
+          row.mobileNumber,
+          row.residentialArea,
+          row.educationalQualification,
+          row.teachingExperience,
+          row.currentPreviousSchool,
+          row.status,
+          row.submittedDate,
+          row.adminRemarks
+        ].map(csvCell).join(','))
+      ].join('\n');
+
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'teacher-applications.csv';
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    function csvCell(value) {
+      const text = String(value || '');
+      return `"${text.replace(/"/g, '""')}"`;
     }
 
     async function apiPost(action, body) {
@@ -598,11 +792,6 @@
         throw new Error(result.message || 'Request failed');
       }
       return result.data;
-    }
-
-    function formatDate(value) {
-      const date = new Date(value);
-      return Number.isNaN(date.getTime()) ? String(value || '') : date.toLocaleString();
     }
 
     function showToast(message, isError) {
@@ -633,4 +822,5 @@
   </script>
 </body>
 </html>
+
 
