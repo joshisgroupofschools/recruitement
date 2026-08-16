@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Teacher Recruitment Portal</title>
   <style>
     :root{
@@ -17,7 +17,7 @@
       --danger:#b24040;
       --shadow:0 20px 40px rgba(33,48,42,.08);
     }
-    *{box-sizing:border-box}
+    *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
     body{
       margin:0;
       font-family:Segoe UI,Tahoma,sans-serif;
@@ -26,11 +26,11 @@
         radial-gradient(circle at top left, rgba(239,226,195,.8), transparent 28%),
         linear-gradient(180deg, #fcfaf5 0%, var(--bg) 100%);
     }
-    .wrap{max-width:980px;margin:0 auto;padding:18px}
-    .hero,.panel{
+    .wrap{max-width:980px;margin:0 auto;padding:14px}
+    .hero,.panel,.success-panel{
       background:var(--paper);
       border:1px solid var(--line);
-      border-radius:28px;
+      border-radius:24px;
       box-shadow:var(--shadow);
     }
     .hero{
@@ -40,7 +40,7 @@
         var(--paper);
       color:#fff;
     }
-    .hero-inner{padding:28px 22px}
+    .hero-inner{padding:24px 18px}
     .tag{
       display:inline-flex;
       padding:8px 12px;
@@ -52,9 +52,9 @@
       background:rgba(255,255,255,.16);
     }
     h1,h2,p{margin:0}
-    h1{margin-top:14px;font-size:30px;line-height:1.12}
+    h1{margin-top:14px;font-size:28px;line-height:1.12}
     .hero p{margin-top:10px;max-width:640px;line-height:1.55;color:rgba(255,255,255,.9)}
-    .panel{margin-top:16px;padding:20px}
+    .panel,.success-panel{margin-top:14px;padding:18px}
     .panel-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap}
     .panel-head p{margin-top:8px;color:var(--muted);line-height:1.55}
     .step-badge{
@@ -65,20 +65,28 @@
       font-size:13px;
       font-weight:700;
     }
+    .loading{
+      margin-top:16px;
+      padding:16px;
+      border:1px dashed var(--line);
+      border-radius:18px;
+      color:var(--muted);
+      text-align:center;
+    }
     .roles{
       display:grid;
-      gap:14px;
-      margin-top:18px;
+      gap:12px;
+      margin-top:16px;
     }
     .role-card{
       border:1px solid var(--line);
-      border-radius:22px;
-      padding:18px;
+      border-radius:20px;
+      padding:16px;
       background:#fff;
       cursor:pointer;
       transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease;
     }
-    .role-card:hover{transform:translateY(-2px);box-shadow:0 14px 28px rgba(33,48,42,.08)}
+    .role-card:hover{transform:translateY(-2px);box-shadow:0 12px 24px rgba(33,48,42,.08)}
     .role-card.selected{
       border-color:var(--brand);
       box-shadow:0 0 0 3px rgba(31,90,70,.12);
@@ -102,13 +110,12 @@
       background:var(--brand);
       color:#fff;
     }
-    .role-card h3{margin:0;font-size:20px}
-    .role-card p{margin-top:8px;color:var(--muted);line-height:1.5}
+    .role-card h3{margin:0;font-size:18px;line-height:1.3}
     .toolbar{
       display:flex;
       gap:10px;
       flex-wrap:wrap;
-      margin-top:18px;
+      margin-top:16px;
     }
     .btn{
       border:none;
@@ -116,6 +123,7 @@
       padding:14px 18px;
       cursor:pointer;
       font:inherit;
+      min-height:48px;
     }
     .btn-primary{background:var(--brand);color:#fff;font-weight:700}
     .btn-primary:hover{background:var(--brand-dark)}
@@ -125,7 +133,7 @@
       display:flex;
       gap:10px;
       flex-wrap:wrap;
-      margin-top:16px;
+      margin-top:14px;
     }
     .chip{
       padding:9px 12px;
@@ -138,7 +146,7 @@
     form{
       display:grid;
       gap:14px;
-      margin-top:18px;
+      margin-top:16px;
     }
     .field{display:flex;flex-direction:column;gap:8px}
     label{font-weight:600}
@@ -151,8 +159,8 @@
       background:#fff;
       color:var(--ink);
       font:inherit;
+      min-height:48px;
     }
-    .hint{font-size:13px;color:var(--muted)}
     .toast{
       position:fixed;
       left:50%;
@@ -170,9 +178,26 @@
     }
     .toast.show{display:block}
     .toast.error{color:var(--danger)}
+    .success-panel{
+      text-align:center;
+      padding:28px 18px;
+    }
+    .success-badge{
+      width:68px;
+      height:68px;
+      margin:0 auto 16px;
+      border-radius:999px;
+      display:grid;
+      place-items:center;
+      background:#e7f1eb;
+      color:var(--brand);
+      font-size:30px;
+      font-weight:700;
+    }
+    .success-panel p{margin-top:10px;color:var(--muted);line-height:1.6}
     .hidden{display:none!important}
     @media (min-width:768px){
-      .wrap{padding:24px}
+      .wrap{padding:22px}
       .hero-inner{padding:34px}
       h1{font-size:42px}
       .roles{grid-template-columns:repeat(2,minmax(0,1fr))}
@@ -187,21 +212,22 @@
       <div class="hero-inner">
         <span class="tag">Teacher Recruitment</span>
         <h1>Apply to Joshi's Group of Schools</h1>
-        <p>Select the role or roles you want first. After that, fill in your basic details and submit.</p>
+        <p>Select your role first, then fill in your details and submit.</p>
       </div>
     </section>
 
-    <section class="panel">
+    <section id="formPanel" class="panel">
       <div class="panel-head">
         <div>
           <h2>Role Applying For <span class="req">*</span></h2>
-          <p>Choose one or more role cards. The admin can edit these cards any time.</p>
+          <p>Choose one or more role cards.</p>
         </div>
         <div id="stepBadge" class="step-badge">Step 1 of 2</div>
       </div>
 
       <div id="roleSelectionStep">
-        <div id="rolesGrid" class="roles"></div>
+        <div id="rolesLoading" class="loading">Loading roles...</div>
+        <div id="rolesGrid" class="roles hidden"></div>
         <div class="toolbar">
           <button id="confirmRolesBtn" class="btn btn-primary" type="button">Confirm Selection</button>
         </div>
@@ -213,11 +239,11 @@
         <form id="applicationForm">
           <div class="field">
             <label for="fullName">Full Name <span class="req">*</span></label>
-            <input id="fullName" name="fullName" type="text">
+            <input id="fullName" name="fullName" type="text" autocomplete="name">
           </div>
           <div class="field">
             <label for="mobileNumber">Mobile Number <span class="req">*</span></label>
-            <input id="mobileNumber" name="mobileNumber" type="tel">
+            <input id="mobileNumber" name="mobileNumber" type="tel" inputmode="numeric" autocomplete="tel">
           </div>
           <div class="field full">
             <label for="residentialArea">Residential Area (Like Uppal, Boduppal, Peerzadiguda) <span class="req">*</span></label>
@@ -246,12 +272,19 @@
         </form>
       </div>
     </section>
+
+    <section id="successPanel" class="success-panel hidden">
+      <div class="success-badge">&#10003;</div>
+      <h2>Application Submitted</h2>
+      <p>Our recruitment team will soon reach out to you.</p>
+    </section>
   </div>
 
   <div id="toast" class="toast"></div>
 
   <script>
     const API_URL = 'https://script.google.com/macros/s/AKfycbyY9QQ3C8g-OFnUe0AmeH9ursYlKaFDkwMnnYBTy1Thcw2_Y9g8jgmVzEGRKJfS4VqsqA/exec';
+    const ROLE_CACHE_KEY = 'teacher_recruitment_roles_cache_v1';
     const state = {
       roles: [],
       experienceOptions: [],
@@ -263,23 +296,44 @@
     document.getElementById('backBtn').addEventListener('click', showRoleSelection);
     document.getElementById('applicationForm').addEventListener('submit', submitApplication);
 
-    async function init() {
+    function init() {
+      renderCachedRoles();
+      fetchBootstrap();
+    }
+
+    function renderCachedRoles() {
+      try {
+        const cached = JSON.parse(localStorage.getItem(ROLE_CACHE_KEY) || '{}');
+        if (Array.isArray(cached.roles) && cached.roles.length) {
+          state.roles = cached.roles;
+          renderRoles();
+        }
+      } catch (error) {}
+    }
+
+    async function fetchBootstrap() {
       try {
         const data = await apiGet('bootstrap');
         state.roles = data.roles || [];
         state.experienceOptions = data.experienceOptions || [];
+        localStorage.setItem(ROLE_CACHE_KEY, JSON.stringify({ roles: state.roles }));
         renderRoles();
         renderExperienceOptions();
       } catch (error) {
-        showToast(error.message || 'Could not load form.', true);
+        if (!state.roles.length) {
+          showToast(error.message || 'Could not load form.', true);
+        }
       }
     }
 
     function renderRoles() {
       const grid = document.getElementById('rolesGrid');
+      const loading = document.getElementById('rolesLoading');
       grid.innerHTML = '';
+      loading.classList.toggle('hidden', !!state.roles.length);
+      grid.classList.toggle('hidden', !state.roles.length);
       if (!state.roles.length) {
-        grid.innerHTML = '<div class="hint">No roles available right now.</div>';
+        loading.textContent = 'No roles available right now.';
         return;
       }
       state.roles.forEach(role => {
@@ -289,10 +343,7 @@
         card.dataset.roleId = role.id;
         card.innerHTML = `
           <div class="role-top">
-            <div>
-              <h3>${escapeHtml(role.title)}</h3>
-              <p>${escapeHtml(role.description || '')}</p>
-            </div>
+            <h3>${escapeHtml(role.title)}</h3>
             <div class="check">&#10003;</div>
           </div>
         `;
@@ -304,9 +355,11 @@
 
     function renderExperienceOptions() {
       const select = document.getElementById('teachingExperience');
-      state.experienceOptions.forEach(option => {
+      if (select.dataset.filled === '1') return;
+      (state.experienceOptions || []).forEach(option => {
         select.appendChild(new Option(option, option));
       });
+      select.dataset.filled = '1';
     }
 
     function toggleRole(roleId) {
@@ -366,12 +419,12 @@
           teachingExperience: document.getElementById('teachingExperience').value,
           currentPreviousSchool: document.getElementById('currentPreviousSchool').value.trim()
         };
-        const result = await apiPost('submitApplication', { payload });
+        await apiPost('submitApplication', { payload });
         event.target.reset();
         state.selectedRoleIds = [];
         syncRoleSelectionUI();
-        showRoleSelection();
-        showToast(result.message, false);
+        document.getElementById('formPanel').classList.add('hidden');
+        document.getElementById('successPanel').classList.remove('hidden');
       } catch (error) {
         showToast(error.message || 'Could not submit application.', true);
       } finally {
