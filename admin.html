@@ -6,75 +6,187 @@
   <title>Teacher Recruitment Admin</title>
   <style>
     :root{
-      --bg:#f4f8f6;
-      --card:#ffffff;
-      --primary:#1f5f4a;
-      --primary-dark:#184839;
-      --muted:#61776f;
-      --border:#d7e2dc;
-      --text:#18342a;
-      --danger:#a93d3d;
-      --success:#1f7a4c;
+      --bg:#f3f0e8;
+      --paper:#fffdf9;
+      --ink:#23312c;
+      --muted:#68756f;
+      --line:#ddd4c6;
+      --brand:#1d5a45;
+      --brand-dark:#154132;
+      --accent:#ebe0c3;
+      --danger:#b74747;
+      --shadow:0 18px 36px rgba(35,49,44,.08);
     }
     *{box-sizing:border-box}
-    body{margin:0;padding:14px;background:linear-gradient(180deg,#f7fbf9 0%,var(--bg) 100%);font-family:Segoe UI,Tahoma,sans-serif;color:var(--text)}
-    .wrap{max-width:1200px;margin:0 auto}
-    .card,.panel,.modal{background:var(--card);border:1px solid var(--border);border-radius:20px;box-shadow:0 12px 34px rgba(24,52,42,.08)}
-    .card,.panel{padding:16px}
-    h1,h2,h3,p{margin:0}
-    .sub{margin-top:8px;color:var(--muted)}
-    .login{max-width:420px;margin:70px auto 0}
-    input,select,textarea,button{font:inherit}
-    input,select,textarea{width:100%;padding:13px 14px;border:1px solid var(--border);border-radius:14px;background:#fbfdfc;color:var(--text)}
-    textarea{min-height:110px;resize:vertical}
-    .field{display:flex;flex-direction:column;gap:8px}
-    .field + .field{margin-top:12px}
-    .btn{border:none;border-radius:14px;padding:13px 16px;cursor:pointer}
-    .btn-primary{background:var(--primary);color:#fff;font-weight:700}
-    .btn-primary:hover{background:var(--primary-dark)}
-    .btn-secondary{background:#eef4f1;color:var(--text);border:1px solid var(--border)}
-    .btn-danger{background:#faecec;color:var(--danger);border:1px solid #efcfcf}
-    .toolbar,.topbar,.filters,.inline{display:flex;gap:10px;flex-wrap:wrap}
-    .topbar{justify-content:space-between;align-items:flex-start;margin-bottom:14px}
-    .hidden{display:none!important}
-    .stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-    .stat{padding:16px;border-radius:18px;border:1px solid var(--border);background:linear-gradient(180deg,#fff,#f5faf7);text-align:left}
-    .stat strong{display:block;margin-top:8px;font-size:28px}
-    .filters{margin:14px 0}
-    .filters .field{flex:1 1 180px}
-    .mobile-list{display:grid;gap:12px}
-    .app-card{padding:16px;border:1px solid var(--border);border-radius:18px;background:#fff}
-    .app-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
-    .app-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:14px}
-    .app-grid small,.answer small,.q-item small{display:block;color:var(--muted);margin-bottom:4px}
-    .pill{display:inline-flex;padding:8px 12px;border-radius:999px;background:#d9eadf;color:#184839;font-size:13px;font-weight:700}
-    .desktop-table{display:none}
-    table{width:100%;border-collapse:collapse;min-width:900px}
-    th,td{padding:12px;border-bottom:1px solid var(--border);text-align:left;vertical-align:top}
-    th{background:#f6faf8;color:var(--muted);font-size:12px;text-transform:uppercase}
-    .table-wrap{overflow:auto;border:1px solid var(--border);border-radius:16px}
-    .modal-backdrop{position:fixed;inset:0;background:rgba(18,42,34,.4);display:none;align-items:center;justify-content:center;padding:16px;z-index:10}
-    .modal-backdrop.show{display:flex}
-    .modal{width:min(100%,560px);max-height:min(88vh,820px);overflow:auto;padding:18px}
-    .answers,.q-list{display:grid;gap:12px}
-    .answer,.q-item{padding:14px;border:1px solid var(--border);border-radius:16px;background:#fbfdfc}
-    .section-tabs{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
-    .toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);display:none;background:#fff;border:1px solid var(--border);border-radius:14px;padding:13px 16px;box-shadow:0 10px 24px rgba(24,52,42,.12);z-index:15}
-    .toast.show{display:block}
-    .toast.success{color:var(--success)}
-    .toast.error{color:var(--danger)}
-    .q-grid{display:grid;gap:10px}
-    .empty{padding:24px;border:1px dashed var(--border);border-radius:16px;text-align:center;color:var(--muted)}
-    .btn[disabled]{opacity:.65;cursor:not-allowed}
-    @media (min-width:768px){
-      body{padding:20px}
-      .stats{grid-template-columns:repeat(2,minmax(0,1fr))}
-      .desktop-table{display:block}
-      .mobile-list{display:none}
-      .q-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+    body{
+      margin:0;
+      padding:18px;
+      font-family:Segoe UI,Tahoma,sans-serif;
+      color:var(--ink);
+      background:
+        radial-gradient(circle at top right, rgba(235,224,195,.75), transparent 26%),
+        linear-gradient(180deg,#fcfaf5 0%,var(--bg) 100%);
     }
-    @media (min-width:1024px){
-      .stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .wrap{max-width:1220px;margin:0 auto}
+    .card,.panel,.modal{
+      background:var(--paper);
+      border:1px solid var(--line);
+      border-radius:24px;
+      box-shadow:var(--shadow);
+    }
+    .card,.panel{padding:18px}
+    h1,h2,h3,p{margin:0}
+    .sub{margin-top:8px;color:var(--muted);line-height:1.55}
+    .hidden{display:none!important}
+    input,textarea,button{font:inherit}
+    input,textarea{
+      width:100%;
+      padding:13px 14px;
+      border:1px solid var(--line);
+      border-radius:16px;
+      background:#fff;
+      color:var(--ink);
+    }
+    textarea{min-height:96px;resize:vertical}
+    .field{display:flex;flex-direction:column;gap:8px}
+    .btn{
+      border:none;
+      border-radius:16px;
+      padding:13px 16px;
+      cursor:pointer;
+    }
+    .btn-primary{background:var(--brand);color:#fff;font-weight:700}
+    .btn-primary:hover{background:var(--brand-dark)}
+    .btn-secondary{background:#efe8db;color:var(--ink);border:1px solid var(--line)}
+    .btn-danger{background:#faeded;color:var(--danger);border:1px solid #efcdcd}
+    .btn[disabled]{opacity:.55;cursor:not-allowed}
+    .login{max-width:420px;margin:70px auto 0}
+    .topbar,.toolbar,.tabbar,.modal-top{display:flex;gap:10px;flex-wrap:wrap}
+    .topbar,.modal-top{justify-content:space-between;align-items:flex-start}
+    .toolbar{margin-top:16px}
+    .tabbar{margin-top:14px}
+    .tab-btn.active{background:var(--brand);color:#fff}
+    .roles-grid{
+      display:grid;
+      gap:14px;
+      margin-top:18px;
+    }
+    .role-editor{
+      border:1px solid var(--line);
+      border-radius:22px;
+      padding:16px;
+      background:#fff;
+    }
+    .role-editor .grid{
+      display:grid;
+      gap:12px;
+    }
+    .toggle{
+      display:inline-flex;
+      gap:8px;
+      align-items:center;
+      font-size:14px;
+      color:var(--muted);
+    }
+    .toggle input{width:auto}
+    .table-wrap{
+      margin-top:16px;
+      overflow:auto;
+      border:1px solid var(--line);
+      border-radius:20px;
+      background:#fff;
+    }
+    table{width:100%;border-collapse:collapse;min-width:980px}
+    th,td{
+      padding:14px 12px;
+      border-bottom:1px solid var(--line);
+      text-align:left;
+      vertical-align:top;
+    }
+    th{
+      background:#f7f3eb;
+      font-size:12px;
+      letter-spacing:.04em;
+      text-transform:uppercase;
+      color:var(--muted);
+    }
+    tbody tr{cursor:pointer}
+    tbody tr:hover{background:#fbfaf7}
+    .empty{
+      margin-top:16px;
+      padding:24px;
+      border:1px dashed var(--line);
+      border-radius:18px;
+      color:var(--muted);
+      text-align:center;
+    }
+    .modal-backdrop{
+      position:fixed;
+      inset:0;
+      background:rgba(23,38,31,.42);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding:16px;
+      z-index:10;
+    }
+    .modal-backdrop.show{display:flex}
+    .modal{
+      width:min(100%,680px);
+      max-height:min(88vh,860px);
+      overflow:auto;
+      padding:20px;
+    }
+    .detail-grid{
+      display:grid;
+      gap:12px;
+      margin-top:16px;
+    }
+    .detail{
+      padding:14px;
+      border:1px solid var(--line);
+      border-radius:18px;
+      background:#fff;
+    }
+    .detail small{display:block;color:var(--muted);margin-bottom:6px}
+    .contact-actions{
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+      margin-top:16px;
+    }
+    .icon-btn{
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      text-decoration:none;
+    }
+    .icon{
+      width:18px;
+      height:18px;
+      display:block;
+    }
+    .toast{
+      position:fixed;
+      left:50%;
+      bottom:20px;
+      transform:translateX(-50%);
+      min-width:220px;
+      max-width:calc(100vw - 24px);
+      padding:14px 16px;
+      border-radius:14px;
+      border:1px solid var(--line);
+      background:#fff;
+      box-shadow:0 12px 28px rgba(35,49,44,.14);
+      display:none;
+      z-index:15;
+    }
+    .toast.show{display:block}
+    .toast.error{color:var(--danger)}
+    @media (min-width:768px){
+      body{padding:24px}
+      .role-editor .grid{grid-template-columns:1.2fr 1.5fr .5fr}
+      .detail-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
     }
   </style>
 </head>
@@ -82,84 +194,69 @@
   <div class="wrap">
     <section id="loginScreen" class="card login">
       <h1>Admin Login</h1>
-      <p class="sub">Enter the admin password to open the dashboard.</p>
-      <div class="field">
+      <p class="sub">Enter the admin password.</p>
+      <div class="field" style="margin-top:16px;">
         <label for="password">Password</label>
         <input id="password" type="password">
       </div>
-      <div class="field">
+      <div class="toolbar">
         <button id="loginBtn" class="btn btn-primary" type="button">Login</button>
       </div>
     </section>
 
     <section id="dashboard" class="hidden">
-      <div class="topbar">
-        <div>
-          <h1>Teacher Recruitment Admin</h1>
-          <p class="sub">JOSHI'S GROUP OF SCHOOLS</p>
+      <div class="panel">
+        <div class="topbar">
+          <div>
+            <h1>Teacher Recruitment Admin</h1>
+            <p class="sub">Simple admin for role management and applicant review.</p>
+          </div>
+          <button id="logoutBtn" class="btn btn-secondary" type="button">Logout</button>
         </div>
-        <div class="inline">
-          <button class="btn btn-secondary" id="applicantsTabBtn" type="button">Applicants</button>
-          <button class="btn btn-secondary" id="questionsTabBtn" type="button">Manage Form Questions</button>
-          <button class="btn btn-secondary" id="settingsTabBtn" type="button">Settings</button>
-          <button class="btn btn-secondary" id="logoutBtn" type="button">Logout</button>
+
+        <div class="tabbar">
+          <button id="rolesTabBtn" class="btn btn-secondary tab-btn active" type="button">Manage Role Applying For</button>
+          <button id="applicantsTabBtn" class="btn btn-secondary tab-btn" type="button">Applicants Table</button>
         </div>
       </div>
 
-      <div id="applicantsSection">
-        <div class="stats" id="stats"></div>
-        <div class="panel" style="margin-top:14px;">
-          <div class="filters">
-            <div class="field">
-              <label for="search">Search</label>
-              <input id="search" type="text" placeholder="Name or mobile number">
-            </div>
-            <div class="field">
-              <label for="statusFilter">Status</label>
-              <select id="statusFilter"></select>
-            </div>
-            <div id="dynamicFilters" class="filters" style="width:100%;margin:0;"></div>
-            <div class="field" style="flex:0 0 auto;align-self:end;">
-              <button id="applyFiltersBtn" class="btn btn-primary" type="button">Search</button>
-            </div>
+      <section id="rolesSection" class="panel">
+        <div class="topbar">
+          <div>
+            <h2>Manage Role Applying For</h2>
+            <p class="sub">These cards appear first on the public form. Admin can add, edit, disable or delete them.</p>
           </div>
-          <div id="applications"></div>
+          <div class="toolbar" style="margin-top:0;">
+            <button id="addRoleBtn" class="btn btn-secondary" type="button">Add Role</button>
+            <button id="saveRolesBtn" class="btn btn-primary" type="button">Save Roles</button>
+          </div>
         </div>
-      </div>
+        <div id="rolesGrid" class="roles-grid"></div>
+      </section>
 
-      <div id="questionsSection" class="hidden">
-        <div class="panel">
-          <div class="topbar">
-            <div>
-              <h2>Manage Form Questions</h2>
-              <p class="sub">Add, edit, reorder, activate, deactivate, require, or delete questions.</p>
-            </div>
-            <div class="inline">
-              <button class="btn btn-secondary" id="addQuestionBtn" type="button">Add Question</button>
-              <button class="btn btn-primary" id="saveQuestionsBtn" type="button">Save Questions</button>
-            </div>
+      <section id="applicantsSection" class="panel hidden">
+        <div class="topbar">
+          <div>
+            <h2>Applicants Table</h2>
+            <p class="sub">Click any row to see full details, call, WhatsApp and add remarks.</p>
           </div>
-          <div class="q-list" id="questionList"></div>
+          <div class="toolbar" style="margin-top:0;">
+            <button id="seedDataBtn" class="btn btn-secondary" type="button">Insert Seed Data</button>
+          </div>
         </div>
-      </div>
 
-      <div id="settingsSection" class="hidden">
-        <div class="panel">
-          <h2>Settings</h2>
-          <p class="sub">Change the admin password.</p>
-          <div class="field">
-            <label for="currentPassword">Current Password</label>
-            <input id="currentPassword" type="password">
+        <div class="toolbar">
+          <div class="field" style="flex:1 1 320px;">
+            <label for="searchInput">Search</label>
+            <input id="searchInput" type="text" placeholder="Name, mobile, role or area">
           </div>
-          <div class="field">
-            <label for="newPassword">New Password</label>
-            <input id="newPassword" type="password">
-          </div>
-          <div class="field">
-            <button id="updatePasswordBtn" class="btn btn-primary" type="button">Update Password</button>
+          <div style="align-self:end;">
+            <button id="searchBtn" class="btn btn-primary" type="button">Search</button>
           </div>
         </div>
-      </div>
+
+        <div id="applicationsWrap"></div>
+      </section>
     </section>
   </div>
 
@@ -170,51 +267,41 @@
 
   <script>
     const API_URL = 'https://script.google.com/macros/s/AKfycbyY9QQ3C8g-OFnUe0AmeH9ursYlKaFDkwMnnYBTy1Thcw2_Y9g8jgmVzEGRKJfS4VqsqA/exec';
-    const QUESTION_TYPES = [
-      ['short_text', 'Short text'],
-      ['long_text', 'Long text'],
-      ['number', 'Number'],
-      ['mobile_number', 'Mobile number'],
-      ['email', 'Email'],
-      ['date', 'Date'],
-      ['dropdown', 'Dropdown'],
-      ['multiple_choice', 'Multiple choice'],
-      ['multi_select', 'Multi-select / checkbox'],
-      ['file_upload', 'File upload']
-    ];
-
     const state = {
       token: '',
-      dashboard: null,
-      filters: { search: '', status: '', questionFilters: {} },
-      deletedQuestionIds: []
+      dashboard: { roles: [], applications: [] },
+      search: ''
     };
 
     document.getElementById('loginBtn').addEventListener('click', login);
     document.getElementById('logoutBtn').addEventListener('click', logout);
+    document.getElementById('rolesTabBtn').addEventListener('click', () => switchTab('roles'));
     document.getElementById('applicantsTabBtn').addEventListener('click', () => switchTab('applicants'));
-    document.getElementById('questionsTabBtn').addEventListener('click', () => switchTab('questions'));
-    document.getElementById('settingsTabBtn').addEventListener('click', () => switchTab('settings'));
-    document.getElementById('addQuestionBtn').addEventListener('click', addQuestion);
-    document.getElementById('saveQuestionsBtn').addEventListener('click', saveQuestions);
-    document.getElementById('updatePasswordBtn').addEventListener('click', updatePassword);
-    document.getElementById('search').addEventListener('input', e => { state.filters.search = e.target.value; });
-    document.getElementById('statusFilter').addEventListener('change', e => { state.filters.status = e.target.value; });
-    document.getElementById('applyFiltersBtn').addEventListener('click', applyDynamicFilters);
-    document.getElementById('modalBackdrop').addEventListener('click', e => {
-      if (e.target.id === 'modalBackdrop') closeDrawer();
+    document.getElementById('addRoleBtn').addEventListener('click', addRoleCard);
+    document.getElementById('saveRolesBtn').addEventListener('click', saveRoles);
+    document.getElementById('searchBtn').addEventListener('click', loadDashboard);
+    document.getElementById('searchInput').addEventListener('keydown', event => {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        loadDashboard();
+      }
+    });
+    document.getElementById('seedDataBtn').addEventListener('click', seedData);
+    document.getElementById('modalBackdrop').addEventListener('click', event => {
+      if (event.target.id === 'modalBackdrop') closeModal();
     });
 
     async function login() {
       try {
-        const password = document.getElementById('password').value;
-        const result = await apiPost('adminLogin', { password });
+        const result = await apiPost('adminLogin', {
+          password: document.getElementById('password').value
+        });
         state.token = result.token;
         state.dashboard = result.dashboard;
+        document.getElementById('password').value = '';
         document.getElementById('loginScreen').classList.add('hidden');
         document.getElementById('dashboard').classList.remove('hidden');
         renderDashboard();
-        switchTab('applicants');
       } catch (error) {
         showToast(error.message || 'Login failed.', true);
       }
@@ -225,27 +312,25 @@
         await apiPost('adminLogout', { token: state.token });
       } catch (error) {}
       state.token = '';
-      state.dashboard = null;
       document.getElementById('dashboard').classList.add('hidden');
       document.getElementById('loginScreen').classList.remove('hidden');
-      closeDrawer();
+      closeModal();
     }
 
     function switchTab(tab) {
-      document.getElementById('applicantsSection').classList.toggle('hidden', tab !== 'applicants');
-      document.getElementById('questionsSection').classList.toggle('hidden', tab !== 'questions');
-      document.getElementById('settingsSection').classList.toggle('hidden', tab !== 'settings');
+      const rolesActive = tab === 'roles';
+      document.getElementById('rolesSection').classList.toggle('hidden', !rolesActive);
+      document.getElementById('applicantsSection').classList.toggle('hidden', rolesActive);
+      document.getElementById('rolesTabBtn').classList.toggle('active', rolesActive);
+      document.getElementById('applicantsTabBtn').classList.toggle('active', !rolesActive);
     }
 
     async function loadDashboard() {
       try {
+        state.search = document.getElementById('searchInput').value.trim();
         state.dashboard = await apiPost('adminDashboard', {
           token: state.token,
-          filters: {
-            search: state.filters.search,
-            status: state.filters.status,
-            questionFilters: state.filters.questionFilters || {}
-          }
+          search: state.search
         });
         renderDashboard();
       } catch (error) {
@@ -254,362 +339,238 @@
     }
 
     function renderDashboard() {
-      renderStats();
-      renderFilters();
+      renderRoles();
       renderApplications();
-      renderQuestions();
     }
 
-    function renderStats() {
-      const wrap = document.getElementById('stats');
-      wrap.innerHTML = '';
-      (state.dashboard.stats || []).forEach(stat => {
-        const btn = document.createElement('button');
-        btn.className = 'stat btn';
-        btn.type = 'button';
-        btn.innerHTML = `<span>${escapeHtml(stat.label)}</span><strong>${stat.count}</strong>`;
-        btn.addEventListener('click', () => {
-          state.filters.search = '';
-          state.filters.status = stat.filters.status || '';
-          state.filters.questionFilters = {};
-          syncFilters();
-          loadDashboard();
-        });
-        wrap.appendChild(btn);
+    function renderRoles() {
+      const grid = document.getElementById('rolesGrid');
+      grid.innerHTML = '';
+      (state.dashboard.roles || []).forEach(role => {
+        grid.appendChild(buildRoleEditor(role));
       });
-    }
-
-    function renderFilters() {
-      fillSelect('statusFilter', [''].concat(state.dashboard.statuses || []), 'All');
-      renderDynamicFilters();
-      syncFilters();
-    }
-
-    function syncFilters() {
-      document.getElementById('search').value = state.filters.search;
-      document.getElementById('statusFilter').value = state.filters.status;
-      Object.keys(state.filters.questionFilters || {}).forEach(key => {
-        const input = document.querySelector(`[data-filter-key="${key}"]`);
-        if (input) {
-          input.value = state.filters.questionFilters[key];
-        }
-      });
-    }
-
-    function renderDynamicFilters() {
-      const wrap = document.getElementById('dynamicFilters');
-      wrap.innerHTML = '';
-      (state.dashboard.filterQuestions || []).forEach(question => {
-        const field = document.createElement('div');
-        field.className = 'field';
-        field.style.flex = '1 1 180px';
-        const label = document.createElement('label');
-        label.textContent = question.text;
-        field.appendChild(label);
-        const select = document.createElement('select');
-        select.dataset.filterKey = question.key;
-        select.innerHTML = '<option value="">All</option>';
-        (state.dashboard.filterOptions[question.key] || []).forEach(option => {
-          const item = document.createElement('option');
-          item.value = option;
-          item.textContent = option;
-          select.appendChild(item);
-        });
-        field.appendChild(select);
-        wrap.appendChild(field);
-      });
-    }
-
-    function applyDynamicFilters() {
-      const questionFilters = {};
-      document.querySelectorAll('[data-filter-key]').forEach(input => {
-        questionFilters[input.dataset.filterKey] = input.value;
-      });
-      state.filters.questionFilters = questionFilters;
-      loadDashboard();
-    }
-
-    function fillSelect(id, values, firstLabel) {
-      const select = document.getElementById(id);
-      select.innerHTML = '';
-      values.forEach((value, index) => {
-        const option = document.createElement('option');
-        option.value = value;
-        option.textContent = index === 0 ? firstLabel : value;
-        select.appendChild(option);
-      });
-    }
-
-    function renderApplications() {
-      const container = document.getElementById('applications');
-      const applications = state.dashboard.applications || [];
-      container.innerHTML = '';
-      if (!applications.length) {
-        container.innerHTML = '<div class="empty">No applicants found.</div>';
-        return;
+      if (!(state.dashboard.roles || []).length) {
+        addRoleCard();
       }
-
-      const mobile = document.createElement('div');
-      mobile.className = 'mobile-list';
-      applications.forEach(app => mobile.appendChild(buildApplicationCard(app)));
-      container.appendChild(mobile);
-
-      const desktop = document.createElement('div');
-      desktop.className = 'desktop-table';
-      desktop.innerHTML = '<div class="table-wrap"><table><thead><tr><th>Name</th><th>Mobile Number</th><th>Subject</th><th>Qualification</th><th>Experience</th><th>City</th><th>Expected Salary</th><th>Status</th><th>Actions</th></tr></thead><tbody></tbody></table></div>';
-      const tbody = desktop.querySelector('tbody');
-      applications.forEach(app => {
-        const row = document.createElement('tr');
-        row.innerHTML = `<td>${escapeHtml(app.fullName || '')}</td><td>${escapeHtml(app.mobileNumber || '')}</td><td>${escapeHtml(app.subjectApplyingFor || '')}</td><td>${escapeHtml(app.qualification || '')}</td><td>${escapeHtml(String(app.teachingExperienceYears || ''))}</td><td>${escapeHtml(app.cityArea || '')}</td><td>${escapeHtml(String(app.expectedSalary || ''))}</td><td><span class="pill">${escapeHtml(app.status || 'New')}</span></td><td><button class="btn btn-secondary" type="button">Open</button></td>`;
-        row.querySelector('button').addEventListener('click', () => openApplicant(app.applicationId));
-        tbody.appendChild(row);
-      });
-      container.appendChild(desktop);
     }
 
-    function buildApplicationCard(app) {
+    function buildRoleEditor(role) {
       const card = document.createElement('div');
-      card.className = 'app-card';
+      card.className = 'role-editor';
+      card.dataset.id = role.id || '';
       card.innerHTML = `
-        <div class="app-head">
-          <div><strong>${escapeHtml(app.fullName || '')}</strong><div class="sub" style="margin-top:4px;">${escapeHtml(app.subjectApplyingFor || '')}</div></div>
-          <span class="pill">${escapeHtml(app.status || 'New')}</span>
-        </div>
-        <div class="app-grid">
-          <div><small>Mobile</small><div>${escapeHtml(app.mobileNumber || '')}</div></div>
-          <div><small>Experience</small><div>${escapeHtml(String(app.teachingExperienceYears || ''))}</div></div>
-          <div><small>Qualification</small><div>${escapeHtml(app.qualification || '')}</div></div>
-          <div><small>City</small><div>${escapeHtml(app.cityArea || '')}</div></div>
-          <div><small>Expected Salary</small><div>${escapeHtml(String(app.expectedSalary || ''))}</div></div>
-        </div>
-      `;
-      const btn = document.createElement('button');
-      btn.className = 'btn btn-secondary';
-      btn.type = 'button';
-      btn.style.marginTop = '14px';
-      btn.textContent = 'Open Applicant';
-      btn.addEventListener('click', () => openApplicant(app.applicationId));
-      card.appendChild(btn);
-      return card;
-    }
-
-    async function openApplicant(applicationId) {
-      try {
-        const applicant = await apiPost('applicantDetails', { token: state.token, applicationId });
-        renderApplicantDrawer(applicant);
-      } catch (error) {
-        showToast(error.message || 'Could not open applicant.', true);
-      }
-    }
-
-    function renderApplicantDrawer(applicant) {
-      const drawer = document.getElementById('modal');
-      drawer.innerHTML = '';
-      const actions = [
-        applicant.callLink ? `<a class="btn btn-primary" href="${applicant.callLink}">Call</a>` : '',
-        applicant.whatsAppLink ? `<a class="btn btn-secondary" target="_blank" href="${applicant.whatsAppLink}">WhatsApp</a>` : '',
-        applicant.resumeDriveLink ? `<a class="btn btn-secondary" target="_blank" href="${applicant.resumeDriveLink}">View Resume</a>` : '',
-        applicant.resumeDriveLink ? `<a class="btn btn-secondary" target="_blank" href="${applicant.resumeDriveLink}">Download Resume</a>` : ''
-      ].join('');
-      drawer.innerHTML = `
-        <div class="topbar">
-          <div><h3>${escapeHtml(applicant.fullName || '')}</h3><p class="sub">${escapeHtml(applicant.subjectApplyingFor || '')}</p></div>
-          <button class="btn btn-secondary" id="closeDrawerBtn" type="button">Close</button>
-        </div>
-        <div class="answer"><small>Application Date/Time</small><div>${escapeHtml(formatDate(applicant.submittedAt))}</div></div>
-        <div class="inline" style="margin:12px 0 16px;flex-wrap:wrap">${actions}</div>
-        <div class="answers">${(applicant.allAnswers || []).map(answer => `<div class="answer"><small>${escapeHtml(answer.label)}</small><div>${escapeHtml(formatAnswer(answer.value, answer.key))}</div></div>`).join('')}</div>
-        <div class="field" style="margin-top:16px">
-          <label for="drawerStatus">Recruitment Status</label>
-          <select id="drawerStatus">${(state.dashboard.statuses || []).map(status => `<option value="${escapeHtml(status)}"${status === applicant.status ? ' selected' : ''}>${escapeHtml(status)}</option>`).join('')}</select>
-        </div>
-        <div class="field" style="margin-top:12px">
-          <label for="drawerRemarks">Remarks</label>
-          <textarea id="drawerRemarks">${escapeHtml(applicant.adminRemarks || '')}</textarea>
-        </div>
-        <div class="field" style="margin-top:12px">
-          <button class="btn btn-primary" id="saveApplicantBtn" type="button">Save / Update</button>
-        </div>
-      `;
-      document.getElementById('modalBackdrop').classList.add('show');
-      document.getElementById('closeDrawerBtn').addEventListener('click', closeDrawer);
-      document.getElementById('saveApplicantBtn').addEventListener('click', async () => {
-        try {
-          const status = document.getElementById('drawerStatus').value;
-          const remarks = document.getElementById('drawerRemarks').value;
-          const result = await apiPost('updateApplicant', {
-            token: state.token,
-            applicationId: applicant.applicationId,
-            status,
-            remarks
-          });
-          showToast(result.message, false);
-          await loadDashboard();
-          await openApplicant(applicant.applicationId);
-        } catch (error) {
-          showToast(error.message || 'Could not update applicant.', true);
-        }
-      });
-    }
-
-    function closeDrawer() {
-      document.getElementById('modalBackdrop').classList.remove('show');
-    }
-
-    function renderQuestions() {
-      const list = document.getElementById('questionList');
-      list.innerHTML = '';
-      (state.dashboard.questions || []).forEach(question => {
-        list.appendChild(buildQuestionEditor(question));
-      });
-    }
-
-    function buildQuestionEditor(question) {
-      const item = document.createElement('div');
-      item.className = 'q-item';
-      item.dataset.id = question.id;
-      item.innerHTML = `
-        <div class="q-grid">
+        <div class="grid">
           <div class="field">
-            <label>Question Text</label>
-            <input class="q-text" type="text" value="${escapeAttr(question.text || '')}">
+            <label>Role Title</label>
+            <input class="role-title" type="text" value="${escapeAttr(role.title || '')}">
           </div>
           <div class="field">
-            <label>Question Type</label>
-            <select class="q-type">${QUESTION_TYPES.map(type => `<option value="${type[0]}"${type[0] === question.type ? ' selected' : ''}>${type[1]}</option>`).join('')}</select>
-          </div>
-          <div class="field">
-            <label>Options</label>
-            <input class="q-options" type="text" value="${escapeAttr((question.options || []).join(', '))}" placeholder="Comma separated options">
+            <label>Description</label>
+            <input class="role-description" type="text" value="${escapeAttr(role.description || '')}">
           </div>
           <div class="field">
             <label>Order</label>
-            <input class="q-order" type="number" min="1" value="${Number(question.order || 1)}">
+            <input class="role-order" type="number" min="1" value="${Number(role.order || 1)}">
           </div>
         </div>
-        <div class="inline" style="margin-top:12px">
-          <label class="choice"><input class="q-required" type="checkbox"${question.required ? ' checked' : ''}> Required</label>
-          <label class="choice"><input class="q-active" type="checkbox"${question.active ? ' checked' : ''}> Active</label>
-          <button class="btn btn-danger q-delete" type="button">Delete</button>
-          <button class="btn btn-secondary q-up" type="button">Move Up</button>
-          <button class="btn btn-secondary q-down" type="button">Move Down</button>
+        <div class="toolbar">
+          <label class="toggle"><input class="role-active" type="checkbox"${role.active !== false ? ' checked' : ''}> Active</label>
+          <button class="btn btn-danger role-delete" type="button">Delete</button>
         </div>
       `;
-      item.querySelector('.q-delete').addEventListener('click', () => {
-        state.deletedQuestionIds.push(item.dataset.id);
-        item.remove();
+      card.querySelector('.role-delete').addEventListener('click', () => {
+        card.remove();
       });
-      item.querySelector('.q-up').addEventListener('click', () => {
-        const prev = item.previousElementSibling;
-        if (prev) item.parentElement.insertBefore(item, prev);
-      });
-      item.querySelector('.q-down').addEventListener('click', () => {
-        const next = item.nextElementSibling;
-        if (next) item.parentElement.insertBefore(next, item);
-      });
-      return item;
+      return card;
     }
 
-    function addQuestion() {
-      const question = {
-        id: 'q_' + Math.random().toString(36).slice(2, 10),
-        key: '',
-        text: 'New Question',
-        type: 'short_text',
-        required: false,
+    function addRoleCard() {
+      const grid = document.getElementById('rolesGrid');
+      grid.appendChild(buildRoleEditor({
+        id: '',
+        title: '',
+        description: '',
         active: true,
-        fixed: false,
-        order: (document.querySelectorAll('#questionList .q-item').length + 1),
-        options: []
-      };
-      document.getElementById('questionList').appendChild(buildQuestionEditor(question));
+        order: grid.children.length + 1
+      }));
     }
 
-    async function saveQuestions() {
-      const saveBtn = document.getElementById('saveQuestionsBtn');
-      try {
-        saveBtn.disabled = true;
-        const questions = [...document.querySelectorAll('#questionList .q-item')].map((item, index) => {
-          const existing = (state.dashboard.questions || []).find(question => question.id === item.dataset.id) || {};
-          return {
-            id: item.dataset.id,
-            key: existing.key || '',
-            text: item.querySelector('.q-text').value.trim() || 'Untitled Question',
-            type: item.querySelector('.q-type').value,
-            required: item.querySelector('.q-required').checked,
-            active: item.querySelector('.q-active').checked,
-            fixed: false,
-            order: Number(item.querySelector('.q-order').value || (index + 1)),
-            options: item.querySelector('.q-options').value ? item.querySelector('.q-options').value.split(',').map(value => value.trim()).filter(Boolean) : []
-          };
-        }).sort((a, b) => Number(a.order || 0) - Number(b.order || 0));
-
-        const result = await apiPost('saveQuestions', {
-          token: state.token,
-          questions,
-          deletedQuestionIds: state.deletedQuestionIds
-        });
-        state.deletedQuestionIds = [];
-        showToast(result.message, false);
-        await loadDashboard();
-      } catch (error) {
-        showToast(error.message || 'Could not save questions.', true);
-      } finally {
-        saveBtn.disabled = false;
-      }
-    }
-
-    async function updatePassword() {
-      const button = document.getElementById('updatePasswordBtn');
+    async function saveRoles() {
+      const button = document.getElementById('saveRolesBtn');
       try {
         button.disabled = true;
-        const currentPassword = document.getElementById('currentPassword').value;
-        const newPassword = document.getElementById('newPassword').value;
-        const result = await apiPost('updatePassword', { token: state.token, currentPassword, newPassword });
-        document.getElementById('currentPassword').value = '';
-        document.getElementById('newPassword').value = '';
+        const roles = [...document.querySelectorAll('#rolesGrid .role-editor')].map((card, index) => ({
+          id: card.dataset.id,
+          title: card.querySelector('.role-title').value.trim(),
+          description: card.querySelector('.role-description').value.trim(),
+          active: card.querySelector('.role-active').checked,
+          order: Number(card.querySelector('.role-order').value || (index + 1))
+        })).filter(role => role.title);
+
+        const result = await apiPost('saveRoles', {
+          token: state.token,
+          roles
+        });
+        state.dashboard.roles = result.roles || [];
+        renderRoles();
         showToast(result.message, false);
       } catch (error) {
-        showToast(error.message || 'Could not update password.', true);
+        showToast(error.message || 'Could not save roles.', true);
       } finally {
         button.disabled = false;
       }
     }
 
-    async function apiGet(action, params = {}) {
-      const url = new URL(API_URL);
-      url.searchParams.set('action', action);
-      Object.keys(params).forEach(key => {
-        if (params[key] !== undefined && params[key] !== null && params[key] !== '') {
-          url.searchParams.set(key, params[key]);
-        }
+    function renderApplications() {
+      const wrap = document.getElementById('applicationsWrap');
+      const applications = state.dashboard.applications || [];
+      wrap.innerHTML = '';
+
+      if (!applications.length) {
+        wrap.innerHTML = '<div class="empty">No applicants found.</div>';
+        return;
+      }
+
+      const tableWrap = document.createElement('div');
+      tableWrap.className = 'table-wrap';
+      tableWrap.innerHTML = `
+        <table>
+          <thead>
+            <tr>
+              <th>Role Applying For</th>
+              <th>Full Name</th>
+              <th>Mobile Number</th>
+              <th>Residential Area</th>
+              <th>Educational Qualification</th>
+              <th>Teaching Experience</th>
+              <th>Current or Previous School</th>
+              <th>Submitted At</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      `;
+      const tbody = tableWrap.querySelector('tbody');
+      applications.forEach(applicant => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${escapeHtml(applicant.roleApplyingFor || '')}</td>
+          <td>${escapeHtml(applicant.fullName || '')}</td>
+          <td>${escapeHtml(applicant.mobileNumber || '')}</td>
+          <td>${escapeHtml(applicant.residentialArea || '')}</td>
+          <td>${escapeHtml(applicant.educationalQualification || '')}</td>
+          <td>${escapeHtml(applicant.teachingExperience || '')}</td>
+          <td>${escapeHtml(applicant.currentPreviousSchool || '')}</td>
+          <td>${escapeHtml(formatDate(applicant.submittedAt))}</td>
+        `;
+        row.addEventListener('click', () => openApplicant(applicant.applicationId));
+        tbody.appendChild(row);
       });
-      const response = await fetch(url.toString());
-      const result = await response.json();
-      if (result.status !== 'success') throw new Error(result.message || 'Request failed');
-      return result.data;
+      wrap.appendChild(tableWrap);
     }
 
-    async function apiPost(action, body = {}) {
+    async function openApplicant(applicationId) {
+      try {
+        const applicant = await apiPost('applicantDetails', {
+          token: state.token,
+          applicationId
+        });
+        renderApplicantModal(applicant);
+      } catch (error) {
+        showToast(error.message || 'Could not open applicant.', true);
+      }
+    }
+
+    function renderApplicantModal(applicant) {
+      const modal = document.getElementById('modal');
+      modal.innerHTML = `
+        <div class="modal-top">
+          <div>
+            <h3>${escapeHtml(applicant.fullName || '')}</h3>
+            <p class="sub">${escapeHtml(applicant.roleApplyingFor || '')}</p>
+          </div>
+          <button id="closeModalBtn" class="btn btn-secondary" type="button">Close</button>
+        </div>
+
+        <div class="detail-grid">
+          <div class="detail"><small>Mobile Number</small><div>${escapeHtml(applicant.mobileNumber || '')}</div></div>
+          <div class="detail"><small>Residential Area</small><div>${escapeHtml(applicant.residentialArea || '')}</div></div>
+          <div class="detail"><small>Educational Qualification</small><div>${escapeHtml(applicant.educationalQualification || '')}</div></div>
+          <div class="detail"><small>Teaching Experience</small><div>${escapeHtml(applicant.teachingExperience || '')}</div></div>
+          <div class="detail"><small>Current or Previous School</small><div>${escapeHtml(applicant.currentPreviousSchool || '')}</div></div>
+          <div class="detail"><small>Submitted At</small><div>${escapeHtml(formatDate(applicant.submittedAt))}</div></div>
+        </div>
+
+        <div class="contact-actions">
+          ${applicant.callLink ? `<a class="btn btn-primary icon-btn" href="${applicant.callLink}">
+            ${phoneIcon()}
+            <span>Call</span>
+          </a>` : ''}
+          ${applicant.whatsAppLink ? `<a class="btn btn-secondary icon-btn" target="_blank" href="${applicant.whatsAppLink}">
+            ${whatsappIcon()}
+            <span>WhatsApp</span>
+          </a>` : ''}
+        </div>
+
+        <div class="field" style="margin-top:18px;">
+          <label for="applicantRemark">Remark</label>
+          <textarea id="applicantRemark">${escapeHtml(applicant.adminRemarks || '')}</textarea>
+        </div>
+        <div class="toolbar">
+          <button id="saveRemarkBtn" class="btn btn-primary" type="button">Save Remark</button>
+        </div>
+      `;
+
+      document.getElementById('modalBackdrop').classList.add('show');
+      document.getElementById('closeModalBtn').addEventListener('click', closeModal);
+      document.getElementById('saveRemarkBtn').addEventListener('click', async () => {
+        try {
+          const result = await apiPost('updateApplicantRemark', {
+            token: state.token,
+            applicationId: applicant.applicationId,
+            remarks: document.getElementById('applicantRemark').value
+          });
+          showToast(result.message, false);
+          await loadDashboard();
+        } catch (error) {
+          showToast(error.message || 'Could not save remark.', true);
+        }
+      });
+    }
+
+    function closeModal() {
+      document.getElementById('modalBackdrop').classList.remove('show');
+      document.getElementById('modal').innerHTML = '';
+    }
+
+    async function seedData() {
+      const button = document.getElementById('seedDataBtn');
+      try {
+        button.disabled = true;
+        const result = await apiPost('seedDemoData', { token: state.token });
+        showToast(result.message, false);
+        await loadDashboard();
+      } catch (error) {
+        showToast(error.message || 'Could not insert seed data.', true);
+      } finally {
+        button.disabled = false;
+      }
+    }
+
+    async function apiPost(action, body) {
       const response = await fetch(API_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify(Object.assign({ action }, body))
+        body: JSON.stringify(Object.assign({ action }, body || {}))
       });
       if (!response.ok) {
         throw new Error('Network request failed.');
       }
       const result = await response.json();
-      if (result.status !== 'success') throw new Error(result.message || 'Request failed');
+      if (result.status !== 'success') {
+        throw new Error(result.message || 'Request failed');
+      }
       return result.data;
-    }
-
-    function showToast(message, isError) {
-      const toast = document.getElementById('toast');
-      toast.textContent = message;
-      toast.className = 'toast show ' + (isError ? 'error' : 'success');
-      clearTimeout(showToast.timer);
-      showToast.timer = setTimeout(() => toast.className = 'toast', 3200);
     }
 
     function formatDate(value) {
@@ -617,11 +578,22 @@
       return Number.isNaN(date.getTime()) ? String(value || '') : date.toLocaleString();
     }
 
-    function formatAnswer(value, key) {
-      if (key === 'resume_upload') return value ? 'Uploaded' : '-';
-      if (Array.isArray(value)) return value.join(', ');
-      if (value && typeof value === 'object' && value.url) return value.name || value.url;
-      return value === undefined || value === null || value === '' ? '-' : String(value);
+    function showToast(message, isError) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.className = 'toast show' + (isError ? ' error' : '');
+      clearTimeout(showToast.timer);
+      showToast.timer = setTimeout(() => {
+        toast.className = 'toast';
+      }, 3200);
+    }
+
+    function phoneIcon() {
+      return '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.12.9.33 1.77.61 2.61a2 2 0 0 1-.45 2.11L8 9.91a16 16 0 0 0 6.09 6.09l1.47-1.27a2 2 0 0 1 2.11-.45c.84.28 1.71.49 2.61.61A2 2 0 0 1 22 16.92z"></path></svg>';
+    }
+
+    function whatsappIcon() {
+      return '<svg class="icon" viewBox="0 0 32 32" fill="currentColor"><path d="M19.11 17.21c-.27-.14-1.58-.78-1.82-.87-.24-.09-.41-.14-.59.14-.18.27-.68.87-.84 1.05-.15.18-.31.2-.58.07-.27-.14-1.13-.42-2.15-1.34-.79-.7-1.33-1.57-1.49-1.83-.16-.27-.02-.41.12-.54.12-.12.27-.31.41-.47.14-.16.18-.27.27-.45.09-.18.05-.34-.02-.47-.07-.14-.59-1.43-.81-1.96-.21-.51-.43-.44-.59-.45h-.5c-.18 0-.47.07-.72.34-.24.27-.94.92-.94 2.24s.96 2.59 1.09 2.77c.14.18 1.88 2.87 4.56 4.03.64.28 1.14.45 1.53.57.64.2 1.22.17 1.68.1.51-.08 1.58-.65 1.81-1.28.22-.63.22-1.16.15-1.28-.06-.11-.24-.18-.5-.31z"></path><path d="M16.01 3.2c-7.06 0-12.8 5.74-12.8 12.8 0 2.26.59 4.47 1.71 6.41L3 29l6.79-1.78a12.76 12.76 0 0 0 6.22 1.61h.01c7.06 0 12.8-5.74 12.8-12.8S23.08 3.2 16.01 3.2zm0 23.47h-.01a10.62 10.62 0 0 1-5.41-1.49l-.39-.23-4.03 1.06 1.08-3.93-.26-.4a10.61 10.61 0 0 1-1.64-5.67c0-5.86 4.77-10.63 10.64-10.63 2.84 0 5.51 1.11 7.52 3.12a10.55 10.55 0 0 1 3.11 7.51c0 5.86-4.78 10.64-10.61 10.64z"></path></svg>';
     }
 
     function escapeHtml(value) {
