@@ -123,6 +123,10 @@
       font:inherit;
       min-height:48px;
     }
+    select[multiple]{
+      min-height:180px;
+    }
+    .hint{font-size:13px;color:var(--muted)}
     .toast{
       position:fixed;
       left:50%;
@@ -173,7 +177,7 @@
       <div class="hero-inner">
         <span class="tag">Teacher Recruitment</span>
         <h1>Apply to Joshi's Group of Schools</h1>
-        <p>Select your role first, then fill in your details and submit.</p>
+        <p>Select one or more roles first, then fill in your details and submit.</p>
       </div>
     </section>
 
@@ -181,7 +185,7 @@
       <div class="panel-head">
         <div>
           <h2>Role Applying For <span class="req">*</span></h2>
-          <p>Select the role, confirm it, then continue.</p>
+          <p>Select one or more roles, confirm them, then continue.</p>
         </div>
         <div id="stepBadge" class="step-badge">Step 1 of 2</div>
       </div>
@@ -190,9 +194,8 @@
         <div id="rolesLoading" class="loading">Loading roles...</div>
         <div class="field">
           <label for="roleSelect">Role Applying For <span class="req">*</span></label>
-          <select id="roleSelect" class="hidden">
-            <option value="">Select role</option>
-          </select>
+          <select id="roleSelect" class="hidden" multiple></select>
+          <div class="hint">Select multiple roles if needed.</div>
         </div>
         <div class="toolbar">
           <button id="confirmRoleBtn" class="btn btn-primary" type="button">Confirm Selection</button>
@@ -250,11 +253,11 @@
 
   <script>
     const API_URL = 'https://script.google.com/macros/s/AKfycbyY9QQ3C8g-OFnUe0AmeH9ursYlKaFDkwMnnYBTy1Thcw2_Y9g8jgmVzEGRKJfS4VqsqA/exec';
-    const ROLE_CACHE_KEY = 'teacher_recruitment_roles_cache_v2';
+    const ROLE_CACHE_KEY = 'teacher_recruitment_roles_cache_v3';
     const state = {
       roles: [],
       experienceOptions: [],
-      selectedRoleId: ''
+      selectedRoleIds: []
     };
 
     document.addEventListener('DOMContentLoaded', init);
@@ -295,7 +298,7 @@
     function renderRoleSelect() {
       const loading = document.getElementById('rolesLoading');
       const select = document.getElementById('roleSelect');
-      select.innerHTML = '<option value="">Select role</option>';
+      select.innerHTML = '';
       if (!state.roles.length) {
         loading.textContent = 'No roles available right now.';
         select.classList.add('hidden');
@@ -304,9 +307,10 @@
       state.roles.forEach(role => {
         select.appendChild(new Option(role.title, role.id));
       });
-      if (state.selectedRoleId) {
-        select.value = state.selectedRoleId;
-      }
+      state.selectedRoleIds.forEach(roleId => {
+        const option = [...select.options].find(item => item.value === roleId);
+        if (option) option.selected = true;
+      });
       loading.classList.add('hidden');
       select.classList.remove('hidden');
     }
@@ -322,29 +326,30 @@
 
     function confirmRole() {
       const roleSelect = document.getElementById('roleSelect');
-      const selectedRole = state.roles.find(role => role.id === roleSelect.value);
-      if (!selectedRole) {
-        showToast('Please select a role.', true);
+      state.selectedRoleIds = [...roleSelect.selectedOptions].map(option => option.value).filter(Boolean);
+      if (!state.selectedRoleIds.length) {
+        showToast('Please select at least one role.', true);
         return;
       }
-      state.selectedRoleId = selectedRole.id;
       const wrap = document.getElementById('selectedRole');
       wrap.innerHTML = '';
-      const chip = document.createElement('div');
-      chip.className = 'chip';
-      chip.textContent = selectedRole.title;
-      wrap.appendChild(chip);
+      state.roles.filter(role => state.selectedRoleIds.indexOf(role.id) !== -1).forEach(role => {
+        const chip = document.createElement('div');
+        chip.className = 'chip';
+        chip.textContent = role.title;
+        wrap.appendChild(chip);
+      });
       document.getElementById('roleSelectionStep').classList.add('hidden');
       document.getElementById('detailsStep').classList.remove('hidden');
       document.getElementById('stepBadge').textContent = 'Step 2 of 2';
-      document.getElementById('formPanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     function showRoleSelection() {
       document.getElementById('detailsStep').classList.add('hidden');
       document.getElementById('roleSelectionStep').classList.remove('hidden');
       document.getElementById('stepBadge').textContent = 'Step 1 of 2';
-      document.getElementById('formPanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     async function submitApplication(event) {
@@ -354,7 +359,7 @@
         submitBtn.disabled = true;
         submitBtn.textContent = 'Submitting...';
         const payload = {
-          roleId: state.selectedRoleId,
+          roleIds: state.selectedRoleIds.slice(),
           fullName: document.getElementById('fullName').value.trim(),
           mobileNumber: document.getElementById('mobileNumber').value.trim(),
           residentialArea: document.getElementById('residentialArea').value.trim(),
@@ -364,11 +369,11 @@
         };
         await apiPost('submitApplication', { payload });
         event.target.reset();
-        document.getElementById('roleSelect').value = '';
-        state.selectedRoleId = '';
+        state.selectedRoleIds = [];
+        [...document.getElementById('roleSelect').options].forEach(option => option.selected = false);
         document.getElementById('formPanel').classList.add('hidden');
         document.getElementById('successPanel').classList.remove('hidden');
-        document.getElementById('successPanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        window.scrollTo({ top: 0, behavior: 'smooth' });
       } catch (error) {
         showToast(error.message || 'Could not submit application.', true);
       } finally {
@@ -409,4 +414,5 @@
   </script>
 </body>
 </html>
+
 
