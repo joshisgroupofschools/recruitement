@@ -76,18 +76,18 @@
     }
     .roles{
       display:grid;
-      gap:10px;
-      margin-top:14px;
+      gap:6px;
+      margin-top:10px;
       grid-template-columns:repeat(2,minmax(0,1fr));
     }
     .role-card{
       border:1px solid var(--line);
       border-radius:16px;
       background:#fff;
-      padding:12px 10px;
+      padding:8px 7px;
       cursor:pointer;
       text-align:left;
-      min-height:76px;
+      min-height:48px;
       transition:border-color .16s ease, box-shadow .16s ease, transform .16s ease;
     }
     .role-card.selected{
@@ -100,25 +100,25 @@
       display:flex;
       align-items:flex-start;
       justify-content:space-between;
-      gap:8px;
+      gap:6px;
     }
     .role-card h3{
       margin:0;
-      font-size:12px;
-      line-height:1.2;
+      font-size:10px;
+      line-height:1.1;
       font-weight:700;
       white-space:nowrap;
       overflow:hidden;
       text-overflow:ellipsis;
     }
     .check{
-      width:22px;
-      height:22px;
+      width:16px;
+      height:16px;
       border-radius:999px;
       border:1px solid var(--line);
       display:grid;
       place-items:center;
-      font-size:12px;
+      font-size:9px;
       color:transparent;
       background:#fff;
       flex-shrink:0;
@@ -218,8 +218,8 @@
       .hero-inner{padding:28px}
       h1{font-size:38px}
       .roles{grid-template-columns:repeat(3,minmax(0,1fr))}
-      .role-card{min-height:76px;padding:12px 10px}
-      .role-card h3{font-size:13px}
+      .role-card{min-height:54px;padding:9px 8px}
+      .role-card h3{font-size:11px}
       form{grid-template-columns:repeat(2,minmax(0,1fr))}
       .full{grid-column:1/-1}
     }
@@ -505,6 +505,5 @@
   </script>
 </body>
 </html>
-
 
 
