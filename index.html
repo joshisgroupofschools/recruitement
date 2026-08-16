@@ -232,11 +232,11 @@
 </head>
 <body>
   <div class="wrap">
-    <section class="hero">
+    <section id="heroSection" class="hero">
       <div class="hero-inner">
-        <span class="tag">Teacher Recruitment</span>
-        <h1>Apply to Joshi's Group of Schools</h1>
-        <p>Select one or more roles first, then fill in your details and submit.</p>
+        <span class="tag">Career Opportunities</span>
+        <h1>Join Joshi's Group of Schools</h1>
+        <p>Select one or more positions and complete the application form to apply.</p>
       </div>
     </section>
 
@@ -463,6 +463,7 @@
         event.target.reset();
         state.selectedRoleIds = [];
         syncRoleCards();
+        document.getElementById('heroSection').classList.add('hidden');
         document.getElementById('formPanel').classList.add('hidden');
         document.getElementById('successPanel').classList.remove('hidden');
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -510,3 +511,4 @@
   </script>
 </body>
 </html>
+
