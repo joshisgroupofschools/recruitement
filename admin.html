@@ -251,6 +251,16 @@
       margin-top:12px;
       grid-template-columns:repeat(2,minmax(0,1fr));
     }
+    .app-meta > div{
+      min-width:0;
+      padding:10px 12px;
+      border:1px solid var(--line);
+      border-radius:14px;
+      background:var(--paper-soft);
+    }
+    .app-meta > div div{
+      word-break:break-word;
+    }
     .app-meta small,.detail small{
       display:block;
       color:var(--muted);
@@ -338,10 +348,26 @@
     .toast.show{display:block}
     .toast.error{color:var(--danger)}
     .desktop-only{display:none}
+    @media (max-width:767px){
+      .app-meta{grid-template-columns:1fr}
+      .toolbar .field,
+      .toolbar > div[style*="align-self:end"]{
+        flex:1 1 100%!important;
+      }
+      .toolbar > div[style*="align-self:end"] .btn{
+        width:100%;
+      }
+    }
     @media (min-width:768px){
       body{padding:22px}
       .detail-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+      .stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+    }
+    @media (min-width:900px){
       .role-line{align-items:center;flex-wrap:nowrap}
+      .stats{grid-template-columns:repeat(3,minmax(0,1fr))}
+    }
+    @media (min-width:1200px){
       .stats{grid-template-columns:repeat(5,minmax(0,1fr))}
       .desktop-only{display:block}
       .mobile-list{display:none}
@@ -895,4 +921,3 @@
   </script>
 </body>
 </html>
-
