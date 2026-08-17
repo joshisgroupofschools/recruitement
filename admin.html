@@ -221,6 +221,7 @@
       border-collapse:separate;
       border-spacing:0;
       min-width:1120px;
+      table-layout:auto;
     }
     th,td{
       padding:16px 14px;
@@ -263,6 +264,11 @@
     .cell-wrap{
       white-space:normal;
       word-break:break-word;
+    }
+    .cell-nowrap{
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
     }
     .mobile-list{
       display:grid;
@@ -753,8 +759,8 @@
         <table>
           <thead>
             <tr>
-              <th>Role Applying For</th>
-              <th>Full Name</th>
+              <th style="min-width:220px;">Role Applying For</th>
+              <th style="min-width:180px;">Full Name</th>
               <th>Mobile Number</th>
               <th>Residential Area</th>
               <th>Educational Qualification</th>
@@ -778,7 +784,7 @@
           </td>
           <td>
             <div class="cell-stack">
-              <div class="cell-title cell-wrap">${escapeHtml(applicant.fullName || '')}</div>
+              <div class="cell-title cell-nowrap">${escapeHtml(applicant.fullName || '')}</div>
             </div>
           </td>
           <td>
@@ -989,3 +995,4 @@
   </script>
 </body>
 </html>
+
