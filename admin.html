@@ -221,7 +221,7 @@
       border-collapse:separate;
       border-spacing:0;
       min-width:1120px;
-      table-layout:auto;
+      table-layout:fixed;
     }
     th,td{
       padding:16px 14px;
@@ -270,6 +270,15 @@
       overflow:hidden;
       text-overflow:ellipsis;
     }
+    .col-role{width:220px}
+    .col-name{width:210px}
+    .col-mobile{width:200px}
+    .col-area{width:210px}
+    .col-education{width:320px}
+    .col-experience{width:220px}
+    .col-school{width:300px}
+    .col-status{width:160px}
+    .col-date{width:150px}
     .mobile-list{
       display:grid;
       gap:12px;
@@ -757,10 +766,21 @@
       desktop.className = 'table-wrap desktop-only';
       desktop.innerHTML = `
         <table>
+          <colgroup>
+            <col class="col-role">
+            <col class="col-name">
+            <col class="col-mobile">
+            <col class="col-area">
+            <col class="col-education">
+            <col class="col-experience">
+            <col class="col-school">
+            <col class="col-status">
+            <col class="col-date">
+          </colgroup>
           <thead>
             <tr>
-              <th style="min-width:220px;">Role Applying For</th>
-              <th style="min-width:180px;">Full Name</th>
+              <th>Role Applying For</th>
+              <th>Full Name</th>
               <th>Mobile Number</th>
               <th>Residential Area</th>
               <th>Educational Qualification</th>
@@ -995,4 +1015,5 @@
   </script>
 </body>
 </html>
+
 
