@@ -247,6 +247,27 @@
     tbody tr:nth-child(even){background:rgba(248,251,255,.72)}
     tbody tr:hover{background:#eef5ff}
     tbody tr:hover td:first-child{box-shadow:inset 4px 0 0 var(--brand)}
+    tbody tr.row-active{background:#ecfdf3}
+    tbody tr.row-walked-in{background:#fff9db}
+    tbody tr.row-rejected{background:#fef2f2}
+    tbody tr.row-appointed{
+      background:#16a34a;
+      color:#fff;
+    }
+    tbody tr.row-appointed td{
+      border-bottom-color:rgba(255,255,255,.18);
+    }
+    tbody tr.row-appointed .cell-title,
+    tbody tr.row-appointed .cell-wrap,
+    tbody tr.row-appointed .role-preview{
+      color:#fff;
+    }
+    tbody tr.row-appointed:hover{
+      background:#15803d;
+    }
+    tbody tr.row-active:hover{background:#dcfce7}
+    tbody tr.row-walked-in:hover{background:#fef3c7}
+    tbody tr.row-rejected:hover{background:#fee2e2}
     .cell-title{
       font-weight:700;
       color:var(--ink);
@@ -350,6 +371,26 @@
       font-size:12px;
       font-weight:700;
       border:1px solid rgba(37,99,235,.12);
+    }
+    .pill.status-active{
+      background:#dcfce7;
+      color:#166534;
+      border-color:#bbf7d0;
+    }
+    .pill.status-walked-in{
+      background:#fef3c7;
+      color:#92400e;
+      border-color:#fde68a;
+    }
+    .pill.status-rejected{
+      background:#fee2e2;
+      color:#991b1b;
+      border-color:#fecaca;
+    }
+    .pill.status-appointed{
+      background:#16a34a;
+      color:#fff;
+      border-color:#15803d;
     }
     .empty{
       margin-top:16px;
@@ -859,8 +900,6 @@
             <col class="col-education">
             <col class="col-experience">
             <col class="col-school">
-            <col class="col-status">
-            <col class="col-date">
           </colgroup>
           <thead>
             <tr>
@@ -871,8 +910,6 @@
               <th>Educational Qualification</th>
               <th>Teaching Experience</th>
               <th>Current or Previous School</th>
-              <th>Status</th>
-              <th>Date</th>
             </tr>
           </thead>
           <tbody></tbody>
@@ -881,6 +918,7 @@
       const tbody = desktop.querySelector('tbody');
       applications.forEach(applicant => {
         const row = document.createElement('tr');
+        row.className = getRowStatusClass(applicant.status);
         row.innerHTML = `
           <td>
             <div class="cell-stack">
@@ -917,12 +955,6 @@
               <div class="cell-wrap">${escapeHtml(applicant.currentPreviousSchool || '')}</div>
             </div>
           </td>
-          <td><span class="pill">${escapeHtml(applicant.status || 'New')}</span></td>
-          <td>
-            <div class="cell-stack">
-              <div class="cell-title">${escapeHtml(applicant.submittedDate || '')}</div>
-            </div>
-          </td>
         `;
         row.addEventListener('click', () => openApplicant(applicant.applicationId));
         tbody.appendChild(row);
@@ -940,6 +972,15 @@
       }
       const preview = roles.slice(0, visibleCount).join(', ');
       return roles.length > visibleCount ? preview + '...' : preview;
+    }
+
+    function getRowStatusClass(status) {
+      const value = String(status || '').trim().toLowerCase();
+      if (value === 'active application') return 'row-active';
+      if (value === 'walked-in' || value === 'walked in') return 'row-walked-in';
+      if (value === 'rejected') return 'row-rejected';
+      if (value === 'appointed') return 'row-appointed';
+      return '';
     }
 
     async function openApplicant(applicationId) {
