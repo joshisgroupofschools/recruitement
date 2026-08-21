@@ -494,9 +494,6 @@
               <option value="">All roles</option>
             </select>
           </div>
-          <div style="align-self:end;">
-            <button id="searchBtn" class="btn btn-primary" type="button">Search</button>
-          </div>
         </div>
 
         <div id="applicationsWrap"></div>
@@ -549,7 +546,6 @@
     document.getElementById('applicantsTabBtn').addEventListener('click', () => switchTab('applicants'));
     document.getElementById('addBulkRolesBtn').addEventListener('click', addBulkRoles);
     document.getElementById('saveRolesBtn').addEventListener('click', saveRoles);
-    document.getElementById('searchBtn').addEventListener('click', loadDashboard);
     document.getElementById('exportBtn').addEventListener('click', exportExcel);
     document.getElementById('statusFilter').addEventListener('change', async event => {
       state.status = event.target.value;
@@ -1075,3 +1071,4 @@
   </script>
 </body>
 </html>
+
