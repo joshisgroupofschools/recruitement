@@ -266,28 +266,9 @@
       word-break:break-word;
     }
     .role-preview{
-      display:flex;
-      flex-wrap:wrap;
-      gap:6px;
-      align-items:flex-start;
-    }
-    .role-chip{
-      display:inline-flex;
-      max-width:100%;
-      padding:6px 10px;
-      border-radius:999px;
-      background:var(--paper-soft);
       color:var(--ink);
-      border:1px solid var(--line);
-      font-size:12px;
-      line-height:1.3;
+      line-height:1.45;
       word-break:break-word;
-    }
-    .role-chip.more{
-      background:var(--brand-soft);
-      color:var(--brand-dark);
-      border-color:rgba(37,99,235,.12);
-      font-weight:700;
     }
     .cell-nowrap{
       white-space:nowrap;
@@ -850,7 +831,7 @@
           <div class="app-card-head">
             <div class="app-card-copy">
               <h3>${escapeHtml(applicant.fullName || '')}</h3>
-              <div class="app-role-preview role-preview">${buildRolePreviewHtml(applicant.roleApplyingFor, 2)}</div>
+              <div class="sub role-preview">${escapeHtml(buildRolePreviewText(applicant.roleApplyingFor, 2))}</div>
             </div>
             <span class="pill">${escapeHtml(applicant.status || 'New')}</span>
           </div>
@@ -903,7 +884,7 @@
         row.innerHTML = `
           <td>
             <div class="cell-stack">
-              <div class="role-preview">${buildRolePreviewHtml(applicant.roleApplyingFor, 2)}</div>
+              <div class="cell-title cell-wrap role-preview">${escapeHtml(buildRolePreviewText(applicant.roleApplyingFor, 2))}</div>
             </div>
           </td>
           <td>
@@ -949,20 +930,16 @@
       wrap.appendChild(desktop);
     }
 
-    function buildRolePreviewHtml(roleApplyingFor, visibleCount) {
+    function buildRolePreviewText(roleApplyingFor, visibleCount) {
       const roles = String(roleApplyingFor || '')
         .split(',')
         .map(role => role.trim())
         .filter(Boolean);
       if (!roles.length) {
-        return '<span class="role-chip">No role</span>';
+        return 'No role';
       }
-      const preview = roles.slice(0, visibleCount).map(role => `<span class="role-chip">${escapeHtml(role)}</span>`);
-      const remaining = roles.length - visibleCount;
-      if (remaining > 0) {
-        preview.push(`<span class="role-chip more">+${remaining} more</span>`);
-      }
-      return preview.join('');
+      const preview = roles.slice(0, visibleCount).join(', ');
+      return roles.length > visibleCount ? preview + '...' : preview;
     }
 
     async function openApplicant(applicationId) {
