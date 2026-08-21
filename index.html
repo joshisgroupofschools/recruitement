@@ -110,9 +110,7 @@
       font-size:12px;
       line-height:1.2;
       font-weight:700;
-      display:-webkit-box;
-      -webkit-line-clamp:2;
-      -webkit-box-orient:vertical;
+      max-height:2.4em;
       overflow:hidden;
       word-break:break-word;
     }
@@ -267,10 +265,10 @@
           </div>
           <div class="field">
             <label for="mobileNumber">Mobile Number <span class="req">*</span></label>
-            <input id="mobileNumber" name="mobileNumber" type="tel" inputmode="numeric" autocomplete="tel">
+            <input id="mobileNumber" name="mobileNumber" type="tel" inputmode="numeric" autocomplete="tel" placeholder="10-digit number or +91 number">
           </div>
           <div class="field full">
-            <label for="residentialArea">Residential Area (e.g., Uppal, Boduppal) — Candidates residing within Hyderabad are preferred. <span class="req">*</span></label>
+            <label for="residentialArea">Residential Area (e.g., Uppal, Boduppal) - Candidates residing within Hyderabad are preferred. <span class="req">*</span></label>
             <input id="residentialArea" name="residentialArea" type="text">
           </div>
           <div class="field full">
@@ -444,16 +442,41 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
+    function normalizeIndianMobile(mobile) {
+      const digits = String(mobile || '').replace(/\D+/g, '');
+      if (digits.length === 12 && digits.startsWith('91')) {
+        return digits.slice(2);
+      }
+      if (digits.length === 11 && digits.startsWith('0')) {
+        return digits.slice(1);
+      }
+      if (digits.length === 10) {
+        return digits;
+      }
+      if (digits.length > 10) {
+        const lastTen = digits.slice(-10);
+        const prefix = digits.slice(0, -10);
+        if ((prefix === '91' || prefix === '0') && /^\d{10}$/.test(lastTen)) {
+          return lastTen;
+        }
+      }
+      return digits;
+    }
+
     async function submitApplication(event) {
       event.preventDefault();
       const submitBtn = document.getElementById('submitBtn');
       try {
         submitBtn.disabled = true;
         submitBtn.textContent = 'Submitting...';
+        const normalizedMobile = normalizeIndianMobile(document.getElementById('mobileNumber').value);
+        if (!/^\d{10}$/.test(normalizedMobile)) {
+          throw new Error('Enter a valid 10 digit mobile number. Examples: 9176543210 or +91 9176543210');
+        }
         const payload = {
           roleIds: state.selectedRoleIds.slice(),
           fullName: document.getElementById('fullName').value.trim(),
-          mobileNumber: document.getElementById('mobileNumber').value.trim(),
+          mobileNumber: normalizedMobile,
           residentialArea: document.getElementById('residentialArea').value.trim(),
           educationalQualification: document.getElementById('educationalQualification').value.trim(),
           teachingExperience: document.getElementById('teachingExperience').value,
