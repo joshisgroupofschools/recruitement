@@ -541,6 +541,7 @@
       teachingExperience: '',
       roleApplyingFor: ''
     };
+    let searchDebounceTimer = null;
 
     document.getElementById('loginBtn').addEventListener('click', login);
     document.getElementById('logoutBtn').addEventListener('click', logout);
@@ -550,18 +551,29 @@
     document.getElementById('saveRolesBtn').addEventListener('click', saveRoles);
     document.getElementById('searchBtn').addEventListener('click', loadDashboard);
     document.getElementById('exportBtn').addEventListener('click', exportExcel);
-    document.getElementById('statusFilter').addEventListener('change', event => {
+    document.getElementById('statusFilter').addEventListener('change', async event => {
       state.status = event.target.value;
+      await loadDashboard();
     });
-    document.getElementById('experienceFilter').addEventListener('change', event => {
+    document.getElementById('experienceFilter').addEventListener('change', async event => {
       state.teachingExperience = event.target.value;
+      await loadDashboard();
     });
-    document.getElementById('roleFilter').addEventListener('change', event => {
+    document.getElementById('roleFilter').addEventListener('change', async event => {
       state.roleApplyingFor = event.target.value;
+      await loadDashboard();
+    });
+    document.getElementById('searchInput').addEventListener('input', event => {
+      state.search = event.target.value.trim();
+      clearTimeout(searchDebounceTimer);
+      searchDebounceTimer = setTimeout(() => {
+        loadDashboard();
+      }, 250);
     });
     document.getElementById('searchInput').addEventListener('keydown', event => {
       if (event.key === 'Enter') {
         event.preventDefault();
+        clearTimeout(searchDebounceTimer);
         loadDashboard();
       }
     });
@@ -1063,4 +1075,3 @@
   </script>
 </body>
 </html>
-
