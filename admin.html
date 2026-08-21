@@ -482,6 +482,18 @@
               <option value="">All statuses</option>
             </select>
           </div>
+          <div class="field" style="flex:1 1 220px;">
+            <label for="experienceFilter">Teaching Experience</label>
+            <select id="experienceFilter">
+              <option value="">All experience</option>
+            </select>
+          </div>
+          <div class="field" style="flex:1 1 240px;">
+            <label for="roleFilter">Role Applying For</label>
+            <select id="roleFilter">
+              <option value="">All roles</option>
+            </select>
+          </div>
           <div style="align-self:end;">
             <button id="searchBtn" class="btn btn-primary" type="button">Search</button>
           </div>
@@ -523,9 +535,11 @@
     const API_URL = 'https://script.google.com/macros/s/AKfycbyY9QQ3C8g-OFnUe0AmeH9ursYlKaFDkwMnnYBTy1Thcw2_Y9g8jgmVzEGRKJfS4VqsqA/exec';
     const state = {
       token: '',
-      dashboard: { roles: [], applications: [], stats: [], statuses: [] },
+      dashboard: { roles: [], applications: [], stats: [], statuses: [], experienceOptions: [], roleOptions: [] },
       search: '',
-      status: ''
+      status: '',
+      teachingExperience: '',
+      roleApplyingFor: ''
     };
 
     document.getElementById('loginBtn').addEventListener('click', login);
@@ -538,6 +552,12 @@
     document.getElementById('exportBtn').addEventListener('click', exportExcel);
     document.getElementById('statusFilter').addEventListener('change', event => {
       state.status = event.target.value;
+    });
+    document.getElementById('experienceFilter').addEventListener('change', event => {
+      state.teachingExperience = event.target.value;
+    });
+    document.getElementById('roleFilter').addEventListener('change', event => {
+      state.roleApplyingFor = event.target.value;
     });
     document.getElementById('searchInput').addEventListener('keydown', event => {
       if (event.key === 'Enter') {
@@ -557,6 +577,8 @@
         state.token = result.token;
         state.dashboard = result.dashboard;
         state.status = '';
+        state.teachingExperience = '';
+        state.roleApplyingFor = '';
         document.getElementById('password').value = '';
         document.getElementById('loginScreen').classList.add('hidden');
         document.getElementById('dashboard').classList.remove('hidden');
@@ -589,10 +611,14 @@
       try {
         state.search = document.getElementById('searchInput').value.trim();
         state.status = document.getElementById('statusFilter').value;
+        state.teachingExperience = document.getElementById('experienceFilter').value;
+        state.roleApplyingFor = document.getElementById('roleFilter').value;
         state.dashboard = await apiPost('adminDashboard', {
           token: state.token,
           search: state.search,
-          status: state.status
+          status: state.status,
+          teachingExperience: state.teachingExperience,
+          roleApplyingFor: state.roleApplyingFor
         });
         renderDashboard();
       } catch (error) {
@@ -603,6 +629,8 @@
     function renderDashboard() {
       renderStats();
       renderStatusFilter();
+      renderExperienceFilter();
+      renderRoleFilter();
       renderRoles();
       renderApplications();
     }
@@ -630,6 +658,26 @@
       select.innerHTML = '<option value="">All statuses</option>';
       (state.dashboard.statuses || []).forEach(status => {
         select.appendChild(new Option(status, status));
+      });
+      select.value = current;
+    }
+
+    function renderExperienceFilter() {
+      const select = document.getElementById('experienceFilter');
+      const current = state.teachingExperience || '';
+      select.innerHTML = '<option value="">All experience</option>';
+      (state.dashboard.experienceOptions || []).forEach(option => {
+        select.appendChild(new Option(option, option));
+      });
+      select.value = current;
+    }
+
+    function renderRoleFilter() {
+      const select = document.getElementById('roleFilter');
+      const current = state.roleApplyingFor || '';
+      select.innerHTML = '<option value="">All roles</option>';
+      (state.dashboard.roleOptions || []).forEach(option => {
+        select.appendChild(new Option(option, option));
       });
       select.value = current;
     }
@@ -1015,3 +1063,4 @@
   </script>
 </body>
 </html>
+
